@@ -1,0 +1,83 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+}
+
+// TODO: DOCUMENT THIS CRAP
+
+group = p_group
+version = p_version
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'Jitpack'
+        url = 'https://jitpack.io'
+    }
+}
+
+sourceSets {
+    cosmicreach // Premade CosmicReach Serializers
+    libgdx // Premade Libgdx Serializers
+    main   // Main
+    test   // Test
+}
+
+configurations {
+
+    allImpl
+
+    implementation.extendsFrom(allImpl)
+    testImplementation.extendsFrom(allImpl)
+    libgdxImplementation.extendsFrom(allImpl)
+    cosmicreachImplementation.extendsFrom(allImpl)
+
+    allCompileOnly
+    testCompileOnly.extendsFrom(allImpl)
+    compileOnly.extendsFrom(allCompileOnly)
+    libgdxCompileOnly.extendsFrom(allCompileOnly)
+    cosmicreachCompileOnly.extendsFrom(allCompileOnly)
+
+    allRuntimeOnly
+    testRuntimeOnly.extendsFrom(allImpl)
+    runtimeOnly.extendsFrom(allRuntimeOnly)
+    libgdxRuntimeOnly.extendsFrom(allRuntimeOnly)
+    cosmicreachRuntimeOnly.extendsFrom(allRuntimeOnly)
+}
+
+dependencies {
+    // Basic SourceSet Dependency setup
+    libgdxCompileOnly sourceSets.main.output
+    cosmicreachCompileOnly sourceSets.main.output
+
+    // All
+    allCompileOnly "org.jetbrains:annotations:24.0.0"
+
+    // Libgdx
+    libgdxCompileOnly "com.badlogicgames.gdx:gdx:1.13.0"
+
+    // CosmicReach
+    cosmicreachCompileOnly "com.github.FinalForEach:Cosmic-Reach-Save-Library:487a2cdc16"
+
+    // Test
+    testImplementation sourceSets.libgdx.output
+    testImplementation "com.badlogicgames.gdx:gdx:1.13.0"
+    testImplementation "com.github.FinalForEach:Cosmic-Reach-Save-Library:487a2cdc16"
+
+}
+
+tasks.register("buildSourceJar", Jar) {
+    from sourceSets.main.allSource
+}
+
+publishing {
+    publications {
+        maven(MavenPublication) {
+            groupId = group
+            artifactId = name
+
+            artifact source: jar, extension: 'jar'
+            artifact source: buildSourceJar, extension: 'jar'
+        }
+    }
+}
