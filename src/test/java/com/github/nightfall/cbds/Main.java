@@ -1,6 +1,5 @@
 package com.github.nightfall.cbds;
 
-import com.badlogic.gdx.math.collision.BoundingBox;
 import com.github.nightfall.cbds.io.serial.impl.BinDeserializer;
 import com.github.nightfall.cbds.io.serial.impl.BinSerializer;
 import com.github.nightfall.cbds.io.CompoundObject;
@@ -19,7 +18,7 @@ public class Main {
     public static void main(String[] args) throws IOException {
         CBDSConstants.init();
 
-        BinSerializer serializer = new BinSerializer();
+        ISerializer serializer = new BinSerializer();
 
         CompoundObject object = new CompoundObject();
 
@@ -33,25 +32,28 @@ public class Main {
 
         serializer.writeObject("compound", object);
 
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         byte[] bytes = serializer.toBytes();
-        endTime = System.currentTimeMillis();
-        System.out.println("Took " + (endTime - startTime) + "ms to serialize");
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to serialize");
         System.out.println("Size in bytes without compression: " + bytes.length + "\n");
-        startTime = System.currentTimeMillis();
+        startTime = System.nanoTime();
         byte[] bytesC = serializer.toCompressedBytes();
-        endTime = System.currentTimeMillis();
-        System.out.println("Took " + (endTime - startTime) + "ms to serialize with compression");
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to serialize with compression");
         System.out.println("Size in bytes with compression: " + bytesC.length + '\n');
         System.out.println("Size decreased by " + ((100f / bytes.length) * bytesC.length) + "%\n");
-        startTime = System.currentTimeMillis();
-        BinDeserializer deserializer = BinDeserializer.fromCompressedBytes(bytesC);
-
+        startTime = System.nanoTime();
+        IDeserializer deserializer = BinDeserializer.fromCompressedBytes(bytesC);
         object = deserializer.readObject(CompoundObject.class, "compound");
-        endTime = System.currentTimeMillis();
-        System.out.println("Took " + (endTime - startTime) + "ms to deserialize");
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize");
         System.out.println("After Deserialization: " + object.readString("test"));
         System.out.println("After Deserialization key count: " + object.getObjectCount());
+    }
+
+    public static double nanoToMilli(long nano) {
+        return nano / 1e+6;
     }
 
     public static class Test implements BinSerializable {
