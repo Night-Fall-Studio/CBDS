@@ -113,17 +113,17 @@ public interface INamedDeserializer {
     CompoundObject readCompoundObject(String name);
     CompoundObject[] readCompoundObjectArray(String name);
 
-    <T extends IDataStreamSerializable> T readRawObject(Class<T> type, String name) ;
-    <T extends IDataStreamSerializable> T[] readRawObjectArray(Class<T> type, String name);
+    <T extends IDataStreamSerializable> T readRawObject(String name, Class<T> type) ;
+    <T extends IDataStreamSerializable> T[] readRawObjectArray(String name, Class<T> type);
 
-    <T extends INamedSerializable> T readNamedObject(Class<T> type, String name);
-    <T extends INamedSerializable> T[] readNamedObjectArray(Class<T> type, String name);
+    <T extends INamedSerializable> T readNamedObject(String name, Class<T> type);
+    <T extends INamedSerializable> T[] readNamedObjectArray(String name, Class<T> type);
 
-    <T extends IUnNamedSerializable> T readUnNamedObject(Class<T> type, String name);
-    <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(Class<T> type, String name);
+    <T extends IUnNamedSerializable> T readUnNamedObject(String name, Class<T> type);
+    <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(String name, Class<T> type);
 
-    <T> T readCustomObject(Class<T> type, String name);
-    <T> T[] readCustomObjectArray(Class<T> type, String name);
+    <T> T readCustomObject(String name, Class<T> type);
+    <T> T[] readCustomObjectArray(String name, Class<T> type);
 
     Object getObject(String name);
 

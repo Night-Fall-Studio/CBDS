@@ -12,6 +12,7 @@ import com.github.nightfall.cbds.util.ThrowableSupplier;
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Map;
 import java.util.function.Function;
@@ -178,20 +179,11 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
     @Override
     public <T extends IDataStreamSerializable> T[] readRawObjectArray(Class<T> type) throws IOException {
         int length = readInt();
-        try {
-            T[] t = (T[]) type.arrayType().getConstructor().newInstance(length);
-            for (int i = 0; i < t.length; i++) {
-                t[i] = readRawObject(type);
-            }
-            return t;
-        } catch (
-                InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException
-                | IOException e
-        ) {
-            return null;
+        T[] t = (T[]) Array.newInstance(type, length);
+        for (int i = 0; i < t.length; i++) {
+            t[i] = readRawObject(type);
         }
+        return t;
     }
 
     @Override
@@ -213,20 +205,11 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
     @Override
     public <T extends INamedSerializable> T[] readNamedObjectArray(Class<T> type) throws IOException {
         int length = readInt();
-        try {
-            T[] t = (T[]) type.arrayType().getConstructor().newInstance(length);
-            for (int i = 0; i < t.length; i++) {
-                t[i] = readNamedObject(type);
-            }
-            return t;
-        } catch (
-                InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException
-                | IOException e
-        ) {
-            return null;
+        T[] t = (T[]) Array.newInstance(type, length);
+        for (int i = 0; i < t.length; i++) {
+            t[i] = readNamedObject(type);
         }
+        return t;
     }
 
     @Override
@@ -248,20 +231,11 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
     @Override
     public <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(Class<T> type) throws IOException {
         int length = readInt();
-        try {
-            T[] t = (T[]) type.arrayType().getConstructor().newInstance(length);
-            for (int i = 0; i < t.length; i++) {
-                t[i] = readUnNamedObject(type);
-            }
-            return t;
-        } catch (
-                InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException
-                | IOException e
-        ) {
-            return null;
+        T[] t = (T[]) Array.newInstance(type, length);
+        for (int i = 0; i < t.length; i++) {
+            t[i] = readUnNamedObject(type);
         }
+        return t;
     }
 
     @Override
@@ -282,20 +256,11 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
         if (!UNNAMED_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         int length = readInt();
-        try {
-            T[] t = (T[]) type.arrayType().getConstructor().newInstance(length);
-            for (int i = 0; i < t.length; i++) {
-                t[i] = readCustomObject(type);
-            }
-            return t;
-        } catch (
-                InstantiationException | IllegalAccessException
-                | IllegalArgumentException | InvocationTargetException
-                | NoSuchMethodException | SecurityException
-                | IOException e
-        ) {
-            return null;
+        T[] t = (T[]) Array.newInstance(type, length);
+        for (int i = 0; i < t.length; i++) {
+            t[i] = readCustomObject(type);
         }
+        return t;
     }
 
 }

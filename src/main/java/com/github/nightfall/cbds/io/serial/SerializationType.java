@@ -7,15 +7,29 @@ public enum SerializationType {
     STRING_SCHEMA_sBYTE,
 
     BYTE,
-    SHORT,
-    INT,
-    LONG,
+
+    SHORT_sSHORT,
+    SHORT_sBYTE,
+
+    INT_sINT,
+    INT_sSHORT,
+    INT_sBYTE,
+
+    LONG_sLONG,
+    LONG_sINT,
+    LONG_sSHORT,
+    LONG_sBYTE,
+
     FLOAT,
     DOUBLE,
     BOOLEAN,
 
     CHAR,
-    STRING,
+
+    STRING_REGULAR,
+    STRING_sINT,
+    STRING_sSHORT,
+    STRING_sBYTE,
 
     RAW_OBJECT_sINT,
     RAW_OBJECT_sSHORT,

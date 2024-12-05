@@ -24,8 +24,8 @@ public class OrientedBoundingBoxWriterAndReader implements INamedCustomSerializa
     @Override
     public OrientedBoundingBox read(INamedDeserializer deserializer) {
         return new OrientedBoundingBox(
-                deserializer.readCustomObject(BoundingBox.class, "bounds"),
-                deserializer.readCustomObject(Matrix4.class, "transform")
+                deserializer.readCustomObject("bounds", BoundingBox.class),
+                deserializer.readCustomObject("transform", Matrix4.class)
         );
     }
 

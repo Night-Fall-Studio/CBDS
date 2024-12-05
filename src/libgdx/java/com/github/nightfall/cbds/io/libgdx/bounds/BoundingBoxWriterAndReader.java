@@ -22,8 +22,8 @@ public class BoundingBoxWriterAndReader implements INamedCustomSerializable<Boun
     @Override
     public BoundingBox read(INamedDeserializer deserializer) {
         return new BoundingBox(
-                deserializer.readCustomObject(Vector3.class, "min"),
-                deserializer.readCustomObject(Vector3.class, "max")
+                deserializer.readCustomObject("min", Vector3.class),
+                deserializer.readCustomObject("max", Vector3.class)
         );
     }
 

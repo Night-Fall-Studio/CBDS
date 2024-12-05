@@ -15,6 +15,7 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Base64;
 import java.util.HashMap;
@@ -183,11 +184,11 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     public CompoundObject readCompoundObject(String name) {
-        return readNamedObject(CompoundObject.class, name);
+        return readNamedObject(name, CompoundObject.class);
     }
 
     public CompoundObject[] readCompoundObjectArray(String name) {
-        return readNamedObjectArray(CompoundObject.class, name);
+        return readNamedObjectArray(name, CompoundObject.class);
     }
 
     private static byte[] readByteArrayAsPrimitive(Byte[] array) {
@@ -196,7 +197,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
-    public <T extends IDataStreamSerializable> T readRawObject(Class<T> type, String name) {
+    public <T extends IDataStreamSerializable> T readRawObject(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
@@ -216,7 +217,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         }
     }
 
-    public <T extends IDataStreamSerializable> T[] readRawObjectArray(Class<T> type, String name) {
+    public <T extends IDataStreamSerializable> T[] readRawObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
@@ -224,7 +225,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         // If object was not already processed run this
         try {
             Byte[][] objs = (Byte[][]) OBJECT_MAP.get(name);
-            T[] t = (T[]) type.arrayType().getConstructor().newInstance(objs.length);
+            T[] t = (T[]) Array.newInstance(type, objs.length);
             for (int i = 0; i < t.length; i++) {
                 T obj = type.getDeclaredConstructor().newInstance();
                 obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsPrimitive(objs[i]))));
@@ -241,7 +242,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         }
     }
 
-    public <T extends INamedSerializable> T readNamedObject(Class<T> type, String name) {
+    public <T extends INamedSerializable> T readNamedObject(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
@@ -261,41 +262,38 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         }
     }
 
-    public <T extends INamedSerializable> T[] readNamedObjectArray(Class<T> type, String name) {
+    public <T extends INamedSerializable> T[] readNamedObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
 
         // If object array was not already processed run this
         INamedDeserializer[] objs = (INamedDeserializer[]) o;
-        try {
-            T[] t = (T[]) type.arrayType().getConstructor().newInstance(objs.length);
 
-            for (int i = 0; i < t.length; i++) {
-                T obj = null;
-                try {
-                    obj = type.getDeclaredConstructor().newInstance();
-                    obj.read(objs[i]);
-                    t[i] = obj;
-                } catch (
-                        InstantiationException | IllegalAccessException
-                        | IllegalArgumentException | InvocationTargetException
-                        | NoSuchMethodException | SecurityException
-                        | IOException e
-                ) {
-                    objs[i] = null;
-                }
+        T[] t = (T[]) Array.newInstance(type, objs.length);
+
+        for (int i = 0; i < t.length; i++) {
+            T obj = null;
+            try {
+                obj = type.getDeclaredConstructor().newInstance();
+                obj.read(objs[i]);
+                t[i] = obj;
+            } catch (
+                    InstantiationException | IllegalAccessException
+                    | IllegalArgumentException | InvocationTargetException
+                    | NoSuchMethodException | SecurityException
+                    | IOException e
+            ) {
+                objs[i] = null;
             }
-
-            OBJECT_MAP.put(name, t);
-            return t;
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-            return null;
         }
+
+        OBJECT_MAP.put(name, t);
+        return t;
     }
 
     @Override
-    public <T extends IUnNamedSerializable> T readUnNamedObject(Class<T> type, String name) {
+    public <T extends IUnNamedSerializable> T readUnNamedObject(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
@@ -316,41 +314,37 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(Class<T> type, String name) {
+    public <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
 
         // If object array was not already processed run this
         IUnNamedDeserializer[] objs = (IUnNamedDeserializer[]) o;
-        try {
-            T[] t = (T[]) type.arrayType().getConstructor().newInstance(objs.length);
+        T[] t = (T[]) Array.newInstance(type, objs.length);
 
-            for (int i = 0; i < t.length; i++) {
-                T obj = null;
-                try {
-                    obj = type.getDeclaredConstructor().newInstance();
-                    obj.read(objs[i]);
-                    t[i] = obj;
-                } catch (
-                        InstantiationException | IllegalAccessException
-                        | IllegalArgumentException | InvocationTargetException
-                        | NoSuchMethodException | SecurityException
-                        | IOException e
-                ) {
-                    objs[i] = null;
-                }
+        for (int i = 0; i < t.length; i++) {
+            T obj = null;
+            try {
+                obj = type.getDeclaredConstructor().newInstance();
+                obj.read(objs[i]);
+                t[i] = obj;
+            } catch (
+                    InstantiationException | IllegalAccessException
+                    | IllegalArgumentException | InvocationTargetException
+                    | NoSuchMethodException | SecurityException
+                    | IOException e
+            ) {
+                objs[i] = null;
             }
-
-            OBJECT_MAP.put(name, t);
-            return t;
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-            return null;
         }
+
+        OBJECT_MAP.put(name, t);
+        return t;
     }
 
     @Override
-    public <T> T readCustomObject(Class<T> type, String name) {
+    public <T> T readCustomObject(String name, Class<T> type) {
         if (!INamedDeserializer.hasDeserializer(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         Object o = getObject(name);
@@ -367,7 +361,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T> T[] readCustomObjectArray(Class<T> type, String name) {
+    public <T> T[] readCustomObjectArray(String name, Class<T> type) {
         if (!INamedDeserializer.hasDeserializer(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         Object o = OBJECT_MAP.get(name);
@@ -378,17 +372,13 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         INamedDeserializer[] objs = (INamedDeserializer[]) o;
         INamedCustomSerializable<T> customDeserializer = INamedDeserializer.getDeserializer(type);
 
-        try {
-            T[] t = (T[]) type.arrayType().getConstructor().newInstance(objs.length);
+        T[] t = (T[]) Array.newInstance(type, objs.length);
 
-            for (int i = 0; i < t.length; i++) {
-                T obj = customDeserializer.read(objs[i]);
-                t[i] = obj;
-            }
-            return t;
-        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
-            return null;
+        for (int i = 0; i < t.length; i++) {
+            T obj = customDeserializer.read(objs[i]);
+            t[i] = obj;
         }
+        return t;
     }
 
     @Override
