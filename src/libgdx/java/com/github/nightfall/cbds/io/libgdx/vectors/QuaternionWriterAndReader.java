@@ -1,17 +1,19 @@
 package com.github.nightfall.cbds.io.libgdx.vectors;
 
 import com.badlogic.gdx.math.Quaternion;
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 
 import java.io.IOException;
 
-public class QuaternionWriterAndReader implements CustomSerializer<Quaternion>, CustomDeserializer<Quaternion> {
+public class QuaternionWriterAndReader implements INamedCustomSerializable<Quaternion>, IUnNamedCustomSerializable<Quaternion> {
 
     @Override
-    public void write(ISerializer serializer, Quaternion obj) throws IOException {
+    public void write(INamedSerializer serializer, Quaternion obj) throws IOException {
         serializer.writeFloat("x", obj.x);
         serializer.writeFloat("y", obj.y);
         serializer.writeFloat("z", obj.z);
@@ -19,8 +21,31 @@ public class QuaternionWriterAndReader implements CustomSerializer<Quaternion>, 
     }
 
     @Override
-    public Quaternion read(IDeserializer deserializer) {
-        return new Quaternion(deserializer.readFloat("x"), deserializer.readFloat("y"), deserializer.readFloat("z"), deserializer.readFloat("w"));
+    public Quaternion read(INamedDeserializer deserializer) {
+        return new Quaternion(
+                deserializer.readFloat("x"),
+                deserializer.readFloat("y"),
+                deserializer.readFloat("z"),
+                deserializer.readFloat("w")
+        );
+    }
+
+    @Override
+    public Quaternion read(IUnNamedDeserializer in) throws IOException{
+        return new Quaternion(
+                in.readFloat(),
+                in.readFloat(),
+                in.readFloat(),
+                in.readFloat()
+        );
+    }
+
+    @Override
+    public void write(IUnNamedSerializer out, Quaternion obj) throws IOException {
+        out.writeFloat(obj.x);
+        out.writeFloat(obj.y);
+        out.writeFloat(obj.z);
+        out.writeFloat(obj.w);
     }
 
     @Override

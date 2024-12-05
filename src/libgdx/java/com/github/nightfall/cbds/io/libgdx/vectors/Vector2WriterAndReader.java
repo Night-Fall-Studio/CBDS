@@ -1,24 +1,43 @@
 package com.github.nightfall.cbds.io.libgdx.vectors;
 
 import com.badlogic.gdx.math.Vector2;
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 
 import java.io.IOException;
 
-public class Vector2WriterAndReader implements CustomSerializer<Vector2>, CustomDeserializer<Vector2> {
+public class Vector2WriterAndReader implements INamedCustomSerializable<Vector2>, IUnNamedCustomSerializable<Vector2> {
 
     @Override
-    public void write(ISerializer serializer, Vector2 obj) throws IOException {
+    public void write(INamedSerializer serializer, Vector2 obj) throws IOException {
         serializer.writeFloat("x", obj.x);
         serializer.writeFloat("y", obj.y);
     }
 
     @Override
-    public Vector2 read(IDeserializer deserializer) {
-        return new Vector2(deserializer.readFloat("x"), deserializer.readFloat("y"));
+    public Vector2 read(INamedDeserializer deserializer) {
+        return new Vector2(
+                deserializer.readFloat("x"),
+                deserializer.readFloat("y")
+        );
+    }
+
+    @Override
+    public Vector2 read(IUnNamedDeserializer in) throws IOException{
+        return new Vector2(
+                in.readFloat(),
+                in.readFloat()
+        );
+    }
+
+    @Override
+    public void write(IUnNamedSerializer out, Vector2 obj) throws IOException {
+        out.writeFloat(obj.x);
+        out.writeFloat(obj.y);
     }
 
     @Override

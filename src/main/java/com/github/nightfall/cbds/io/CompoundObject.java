@@ -1,12 +1,15 @@
 package com.github.nightfall.cbds.io;
 
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
-import com.github.nightfall.cbds.io.obj.BinSerializable;
-import com.github.nightfall.cbds.io.obj.RawDataSerializable;
-import com.github.nightfall.cbds.io.serial.impl.BinDeserializer;
-import com.github.nightfall.cbds.io.serial.impl.BinSerializer;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
+import com.github.nightfall.cbds.io.serial.impl.NamedBinaryDeserializer;
+import com.github.nightfall.cbds.io.serial.impl.NamedBinarySerializer;
+import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -19,14 +22,14 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class CompoundObject implements BinSerializable, IDeserializer, ISerializer {
+public class CompoundObject implements INamedSerializable, INamedDeserializer, INamedSerializer, IUnNamedSerializable {
 
     Map<String, Object> OBJECT_MAP = new HashMap<>();
 
     public CompoundObject() {}
 
     public CompoundObject(byte[] bytes) throws IOException {
-        read(new BinDeserializer(bytes));
+        read(new NamedBinaryDeserializer(bytes));
     }
 
     public static CompoundObject fromBytes(byte[] bytes) throws IOException {
@@ -37,32 +40,18 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
         return fromBytes(readByteArrayAsPrimitive(bytes));
     }
 
-    public static CompoundObject fromCompressedBytes(byte[] bytes) throws IOException {
-        return new CompoundObject(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
+    public static CompoundObject fromBytes(byte[] bytes, boolean isCompressed) throws IOException {
+        if (isCompressed) return new CompoundObject(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
+        else return fromBytes(bytes);
     }
 
-    public static CompoundObject fromCompressedBytes(Byte[] bytes) throws IOException {
-        return fromCompressedBytes(readByteArrayAsPrimitive(bytes));
-    }
-
-    @Override
-    public IDeserializer newInstance(byte[] bytes) throws IOException {
-        return fromBytes(bytes);
+    public static CompoundObject fromBytes(Byte[] bytes, boolean isCompressed) throws IOException {
+        return fromBytes(readByteArrayAsPrimitive(bytes), isCompressed);
     }
 
     @Override
-    public IDeserializer newInstance(Byte[] bytes) throws IOException {
-        return fromBytes(bytes);
-    }
-
-    @Override
-    public IDeserializer newInstanceFromCompressed(byte[] bytes) throws IOException {
-        return fromCompressedBytes(bytes);
-    }
-
-    @Override
-    public IDeserializer newInstanceFromCompressed(Byte[] bytes) throws IOException {
-        return fromCompressedBytes(bytes);
+    public INamedDeserializer newInstance(byte[] bytes, boolean isCompressed) throws IOException {
+        return fromBytes(bytes, isCompressed);
     }
 
     public byte readByte(String name) {
@@ -194,11 +183,11 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
     }
 
     public CompoundObject readCompoundObject(String name) {
-        return readObject(CompoundObject.class, name);
+        return readNamedObject(CompoundObject.class, name);
     }
 
     public CompoundObject[] readCompoundObjectArray(String name) {
-        return readObjectArray(CompoundObject.class, name);
+        return readNamedObjectArray(CompoundObject.class, name);
     }
 
     private static byte[] readByteArrayAsPrimitive(Byte[] array) {
@@ -207,7 +196,7 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
         return pArray;
     }
 
-    public <T extends RawDataSerializable> T readRawObject(Class<T> type, String name) {
+    public <T extends IDataStreamSerializable> T readRawObject(Class<T> type, String name) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
@@ -227,7 +216,7 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
         }
     }
 
-    public <T extends RawDataSerializable> T[] readRawObjectArray(Class<T> type, String name) {
+    public <T extends IDataStreamSerializable> T[] readRawObjectArray(Class<T> type, String name) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
@@ -252,7 +241,7 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
         }
     }
 
-    public <T extends BinSerializable> T readObject(Class<T> type, String name) {
+    public <T extends INamedSerializable> T readNamedObject(Class<T> type, String name) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
@@ -260,7 +249,7 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
         // If object was not already processed run this
         try {
             T obj = type.getDeclaredConstructor().newInstance();
-            obj.read((BinDeserializer) o);
+            obj.read((INamedDeserializer) o);
             return obj;
         } catch (
                 InstantiationException | IllegalAccessException
@@ -272,13 +261,68 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
         }
     }
 
-    public <T extends BinSerializable> T[] readObjectArray(Class<T> type, String name) {
+    public <T extends INamedSerializable> T[] readNamedObjectArray(Class<T> type, String name) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
 
         // If object array was not already processed run this
-        BinDeserializer[] objs = (BinDeserializer[]) o;
+        INamedDeserializer[] objs = (INamedDeserializer[]) o;
+        try {
+            T[] t = (T[]) type.arrayType().getConstructor().newInstance(objs.length);
+
+            for (int i = 0; i < t.length; i++) {
+                T obj = null;
+                try {
+                    obj = type.getDeclaredConstructor().newInstance();
+                    obj.read(objs[i]);
+                    t[i] = obj;
+                } catch (
+                        InstantiationException | IllegalAccessException
+                        | IllegalArgumentException | InvocationTargetException
+                        | NoSuchMethodException | SecurityException
+                        | IOException e
+                ) {
+                    objs[i] = null;
+                }
+            }
+
+            OBJECT_MAP.put(name, t);
+            return t;
+        } catch (InvocationTargetException | InstantiationException | IllegalAccessException | NoSuchMethodException e) {
+            return null;
+        }
+    }
+
+    @Override
+    public <T extends IUnNamedSerializable> T readUnNamedObject(Class<T> type, String name) {
+        Object o = OBJECT_MAP.get(name);
+
+        if (type.isAssignableFrom(o.getClass())) return (T) o;
+
+        // If object was not already processed run this
+        try {
+            T obj = type.getDeclaredConstructor().newInstance();
+            obj.read((IUnNamedDeserializer) o);
+            return obj;
+        } catch (
+                InstantiationException | IllegalAccessException
+                | IllegalArgumentException | InvocationTargetException
+                | NoSuchMethodException | SecurityException
+                | IOException e
+        ) {
+            return null;
+        }
+    }
+
+    @Override
+    public <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(Class<T> type, String name) {
+        Object o = OBJECT_MAP.get(name);
+
+        if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
+
+        // If object array was not already processed run this
+        IUnNamedDeserializer[] objs = (IUnNamedDeserializer[]) o;
         try {
             T[] t = (T[]) type.arrayType().getConstructor().newInstance(objs.length);
 
@@ -307,14 +351,14 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
 
     @Override
     public <T> T readCustomObject(Class<T> type, String name) {
-        if (!IDeserializer.hasDeserializer(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
+        if (!INamedDeserializer.hasDeserializer(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         Object o = getObject(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
 
         try {
-            return IDeserializer.getDeserializer(type).read((IDeserializer) o);
+            return INamedDeserializer.getDeserializer(type).read((INamedDeserializer) o);
         } catch (
                 IllegalArgumentException | SecurityException e
         ) {
@@ -324,15 +368,15 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
 
     @Override
     public <T> T[] readCustomObjectArray(Class<T> type, String name) {
-        if (!IDeserializer.hasDeserializer(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
+        if (!INamedDeserializer.hasDeserializer(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         Object o = OBJECT_MAP.get(name);
 
         if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
 
         // If object array was not already processed run this
-        IDeserializer[] objs = (IDeserializer[]) o;
-        CustomDeserializer<T> customDeserializer = IDeserializer.getDeserializer(type);
+        INamedDeserializer[] objs = (INamedDeserializer[]) o;
+        INamedCustomSerializable<T> customDeserializer = INamedDeserializer.getDeserializer(type);
 
         try {
             T[] t = (T[]) type.arrayType().getConstructor().newInstance(objs.length);
@@ -353,10 +397,10 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
     }
 
     @Override
-    public void read(IDeserializer deserializer) throws IOException {
+    public void read(INamedDeserializer deserializer) throws IOException {
         String[] keys = deserializer.readStringArray("keys");
 
-        IDeserializer miniDeserializer = deserializer.newInstance(deserializer.readByteArrayAsPrimitive("data"));
+        INamedDeserializer miniDeserializer = deserializer.newInstance(deserializer.readByteArrayAsPrimitive("data"));
 
         for (String key : keys) {
             OBJECT_MAP.put(key, miniDeserializer.getObject(key));
@@ -365,7 +409,13 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
     }
 
     @Override
-    public ISerializer newInstance() throws IOException {
+    public void read(IUnNamedDeserializer deserializer) throws IOException {
+        byte[] bytes = deserializer.readByteArrayAsPrimitive();
+        read(INamedDeserializer.createDefault(bytes, false));
+    }
+
+    @Override
+    public INamedSerializer newInstance() {
         return new CompoundObject();
     }
 
@@ -474,53 +524,70 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
     }
 
     public void writeCompoundObject(String name, CompoundObject object) throws IOException {
-        writeObject(name, object);
+        this.writeNamedObject(name, object);
     }
 
     public void writeCompoundObjectArray(String name, CompoundObject[] array) throws IOException {
-        writeObjectArray(name, array);
+        this.writeNamedObjectArray(name, array);
     }
 
-    public <T extends RawDataSerializable> void writeRawObject(String name, T object) {
+    public <T extends IDataStreamSerializable> void writeRawObject(String name, T object) {
         OBJECT_MAP.put(name, object);
     }
 
-    public <T extends RawDataSerializable> void writeRawObjectArray(String name, T[] array) {
+    public <T extends IDataStreamSerializable> void writeRawObjectArray(String name, T[] array) {
         OBJECT_MAP.put(name, array);
     }
 
-    public <T extends BinSerializable> void writeObject(String name, T object) {
+    public <T extends INamedSerializable> void writeNamedObject(String name, T object) {
         OBJECT_MAP.put(name, object);
     }
 
-    public <T extends BinSerializable> void writeObjectArray(String name, T[] array) {
+    public <T extends INamedSerializable> void writeNamedObjectArray(String name, T[] array) {
         OBJECT_MAP.put(name, array);
+    }
+
+    @Override
+    public <T extends IUnNamedSerializable> void writeUnNamedObject(String name, T object) throws IOException {
+
+    }
+
+    @Override
+    public <T extends IUnNamedSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException {
+
     }
 
     @Override
     public <T> void writeCustomObject(String name, T object) throws IOException {
-
+        OBJECT_MAP.put(name, object);
     }
 
     @Override
     public <T> void writeCustomObjectArray(String name, T[] array) throws IOException {
-
+        OBJECT_MAP.put(name, array);
     }
 
+    @Override
     public int getObjectCount() {
         return OBJECT_MAP.size();
     }
 
+    @Override
     public String[] getKeys() {
         return OBJECT_MAP.keySet().toArray(new String[0]);
     }
 
-    @Override
-    public void write(ISerializer serializer) throws IOException {
+    public void write(IUnNamedSerializer serializer) throws IOException {
+        INamedSerializer miniSerializer = INamedSerializer.createDefault();
+        write(miniSerializer);
+        serializer.writeByteArray(miniSerializer.toBytes());
+    }
 
+    @Override
+    public void write(INamedSerializer serializer) throws IOException {
         serializer.writeStringArray("keys", OBJECT_MAP.keySet().toArray(new String[0]));
 
-        ISerializer miniSerializer = serializer.newInstance();
+        INamedSerializer miniSerializer = serializer.newInstance();
 
         for (String key : OBJECT_MAP.keySet()) {
             Object o = OBJECT_MAP.get(key);
@@ -528,6 +595,15 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
             /*
             * To whomever reads this, I am very sorry about all the if statements, it was necessary to make this work.
             */
+
+            boolean isArrayType = o.getClass().isArray();
+            Class<?> clazz = o.getClass().isArray() ? o.getClass().getComponentType() : o.getClass();
+
+            if (INamedSerializer.hasSerializer(clazz)) {
+                if (isArrayType) miniSerializer.writeCustomObjectArray(key, (Object[]) o);
+                else miniSerializer.writeCustomObject(key, o);
+                continue;
+            }
 
             if (o instanceof Byte) miniSerializer.writeByte(key, ((Byte) o));
             if (o instanceof byte[]) miniSerializer.writeByteArray(key, ((byte[]) o));
@@ -564,17 +640,19 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
             if (o instanceof String) miniSerializer.writeString(key, ((String) o));
             if (o instanceof String[]) miniSerializer.writeStringArray(key, ((String[]) o));
 
-            if (o instanceof BinSerializable) miniSerializer.writeObject(key, (BinSerializable) o);
-            if (o instanceof BinSerializable[]) miniSerializer.writeObjectArray(key, (BinSerializable[]) o);
-            if (o instanceof RawDataSerializable) miniSerializer.writeRawObject(key, (RawDataSerializable) o);
-            if (o instanceof RawDataSerializable[]) miniSerializer.writeRawObjectArray(key, (RawDataSerializable[]) o);
+            if (o instanceof INamedSerializable) miniSerializer.writeNamedObject(key, (INamedSerializable) o);
+            if (o instanceof INamedSerializable[]) miniSerializer.writeNamedObjectArray(key, (INamedSerializable[]) o);
+            if (o instanceof IUnNamedSerializable) miniSerializer.writeUnNamedObject(key, (IUnNamedSerializable) o);
+            if (o instanceof IUnNamedSerializable[]) miniSerializer.writeUnNamedObjectArray(key, (IUnNamedSerializable[]) o);
+            if (o instanceof IDataStreamSerializable) miniSerializer.writeRawObject(key, (IDataStreamSerializable) o);
+            if (o instanceof IDataStreamSerializable[]) miniSerializer.writeRawObjectArray(key, (IDataStreamSerializable[]) o);
         }
 
         serializer.writeByteArray("data", miniSerializer.toBytes());
     }
 
     public byte[] toBytes() throws IOException {
-        BinSerializer serializer = new BinSerializer();
+        NamedBinarySerializer serializer = new NamedBinarySerializer();
         serializer.writeCompoundObject("cbds_compound_object", this);
         return serializer.toBytes();
     }
@@ -587,24 +665,20 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
         return stream.toByteArray();
     }
 
-    public byte[] toBase64() throws IOException {
-        return Base64.getEncoder().encode(toBytes());
+    public String toBase64() throws IOException {
+        return Base64.getEncoder().encodeToString(toBytes());
     }
 
-    public byte[] toCompressedBase64() throws IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        GZIPOutputStream stream1 = new GZIPOutputStream(stream);
-        stream1.write(Base64.getEncoder().encode(toCompressedBytes()));
-        stream1.close();
-        return stream.toByteArray();
+    public String toCompressedBase64() throws IOException {
+        return Base64.getEncoder().encodeToString(toCompressedBytes());
     }
 
-    public byte[] toBytes(ISerializer serializer) throws IOException {
+    public byte[] toBytes(INamedSerializer serializer) throws IOException {
         serializer.writeCompoundObject("cbds_compound_object", this);
         return serializer.toBytes();
     }
 
-    public byte[] toCompressedBytes(ISerializer serializer) throws IOException {
+    public byte[] toCompressedBytes(INamedSerializer serializer) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         GZIPOutputStream stream1 = new GZIPOutputStream(stream);
         stream1.write(toBytes(serializer));
@@ -612,11 +686,11 @@ public class CompoundObject implements BinSerializable, IDeserializer, ISerializ
         return stream.toByteArray();
     }
 
-    public byte[] toBase64(ISerializer serializer) throws IOException {
+    public byte[] toBase64(INamedSerializer serializer) throws IOException {
         return Base64.getEncoder().encode(toBytes(serializer));
     }
 
-    public byte[] toCompressedBase64(ISerializer serializer) throws IOException {
+    public byte[] toCompressedBase64(INamedSerializer serializer) throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         GZIPOutputStream stream1 = new GZIPOutputStream(stream);
         stream1.write(Base64.getEncoder().encode(toCompressedBytes(serializer)));

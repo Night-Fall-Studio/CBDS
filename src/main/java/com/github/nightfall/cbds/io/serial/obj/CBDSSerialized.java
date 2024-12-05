@@ -1,4 +1,4 @@
-package com.github.nightfall.cbds.io.obj;
+package com.github.nightfall.cbds.io.serial.obj;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

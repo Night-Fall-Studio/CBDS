@@ -1,29 +1,47 @@
 package com.github.nightfall.cbds.io.libgdx.bounds.shapes;
 
 import com.badlogic.gdx.math.Circle;
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 
 import java.io.IOException;
 
-public class CircleWriterAndReader implements CustomSerializer<Circle>, CustomDeserializer<Circle> {
+public class CircleWriterAndReader implements INamedCustomSerializable<Circle>, IUnNamedCustomSerializable<Circle> {
 
     @Override
-    public void write(ISerializer serializer, Circle obj) throws IOException {
+    public void write(INamedSerializer serializer, Circle obj) throws IOException {
         serializer.writeFloat("radius", obj.radius);
         serializer.writeFloat("x", obj.x);
         serializer.writeFloat("y", obj.y);
     }
 
     @Override
-    public Circle read(IDeserializer deserializer) {
+    public Circle read(INamedDeserializer deserializer) {
         return new Circle(
                 deserializer.readFloat("radius"),
                 deserializer.readFloat("x"),
                 deserializer.readFloat("y")
         );
+    }
+
+    @Override
+    public Circle read(IUnNamedDeserializer in) throws IOException{
+        return new Circle(
+                in.readFloat(),
+                in.readFloat(),
+                in.readFloat()
+        );
+    }
+
+    @Override
+    public void write(IUnNamedSerializer out, Circle obj) throws IOException {
+        out.writeFloat(obj.radius);
+        out.writeFloat(obj.x);
+        out.writeFloat(obj.y);
     }
 
     @Override

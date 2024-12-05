@@ -1,23 +1,35 @@
 package com.github.nightfall.cbds.io.libgdx.arrays;
 
 import com.badlogic.gdx.utils.CharArray;
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 
 import java.io.IOException;
 
-public class CharArrayWriterAndReader implements CustomSerializer<CharArray>, CustomDeserializer<CharArray> {
+public class CharArrayWriterAndReader implements INamedCustomSerializable<CharArray>, IUnNamedCustomSerializable<CharArray> {
 
     @Override
-    public void write(ISerializer serializer, CharArray obj) throws IOException {
+    public void write(INamedSerializer serializer, CharArray obj) throws IOException {
         serializer.writeCharArray("items", obj.items);
     }
 
     @Override
-    public CharArray read(IDeserializer deserializer) {
+    public CharArray read(INamedDeserializer deserializer) {
         return new CharArray(deserializer.readCharArrayAsPrimitive("items"));
+    }
+
+    @Override
+    public CharArray read(IUnNamedDeserializer in) throws IOException{
+        return new CharArray(in.readCharArrayAsPrimitive());
+    }
+
+    @Override
+    public void write(IUnNamedSerializer out, CharArray obj) throws IOException {
+        out.writeCharArray(obj.items);
     }
 
     @Override

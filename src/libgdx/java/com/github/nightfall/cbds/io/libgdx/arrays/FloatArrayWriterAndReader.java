@@ -1,23 +1,35 @@
 package com.github.nightfall.cbds.io.libgdx.arrays;
 
 import com.badlogic.gdx.utils.FloatArray;
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 
 import java.io.IOException;
 
-public class FloatArrayWriterAndReader implements CustomSerializer<FloatArray>, CustomDeserializer<FloatArray> {
+public class FloatArrayWriterAndReader implements INamedCustomSerializable<FloatArray>, IUnNamedCustomSerializable<FloatArray> {
 
     @Override
-    public void write(ISerializer serializer, FloatArray obj) throws IOException {
+    public void write(INamedSerializer serializer, FloatArray obj) throws IOException {
         serializer.writeFloatArray("items", obj.items);
     }
 
     @Override
-    public FloatArray read(IDeserializer deserializer) {
+    public FloatArray read(INamedDeserializer deserializer) {
         return new FloatArray(deserializer.readFloatArrayAsPrimitive("items"));
+    }
+
+    @Override
+    public FloatArray read(IUnNamedDeserializer in) throws IOException{
+        return new FloatArray(in.readFloatArrayAsPrimitive());
+    }
+
+    @Override
+    public void write(IUnNamedSerializer out, FloatArray obj) throws IOException {
+        out.writeFloatArray(obj.items);
     }
 
     @Override

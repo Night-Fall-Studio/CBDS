@@ -2,44 +2,61 @@ package com.github.nightfall.cbds.io.serial.api;
 
 import com.github.nightfall.cbds.CBDSConstants;
 import com.github.nightfall.cbds.io.CompoundObject;
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.obj.BinSerializable;
-import com.github.nightfall.cbds.io.obj.RawDataSerializable;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
+import com.github.nightfall.cbds.io.serial.impl.NamedBinaryDeserializer;
+import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.zip.GZIPInputStream;
 
-public interface IDeserializer {
+public interface INamedDeserializer {
 
-    HashMap<Class<?>, CustomDeserializer<?>> DESERIALIZER_MAP = new HashMap<>();
+    HashMap<Class<?>, INamedCustomSerializable<?>> NAMED_DESERIALIZER_MAP = new HashMap<>();
 
-    static void registerDeserializer(CustomDeserializer<?> deserializer) {
+    static void registerDeserializer(INamedCustomSerializable<?> deserializer) {
         if (hasDeserializer(deserializer.getSerializableType()) && !CBDSConstants.allowDeserializerOverwriting) CBDSConstants.LOGGER.warn("Cannot overwrite pre-existing serializers, try turning \"com.github.nightfall.cbds.CBDSConstants.allowDeserializerOverwriting\" true.");
         if (deserializer.getSerializableType().isArray()) throw new RuntimeException("cannot register deserializer of array type, I recommend registering the component type instead.");
-        DESERIALIZER_MAP.put(deserializer.getSerializableType(), deserializer);
+        NAMED_DESERIALIZER_MAP.put(deserializer.getSerializableType(), deserializer);
     }
 
-    static <T> CustomDeserializer<T> getDeserializer(Class<T> clazz) {
-        return (CustomDeserializer<T>) DESERIALIZER_MAP.get(clazz);
+    static <T> INamedCustomSerializable<T> getDeserializer(Class<T> clazz) {
+        return (INamedCustomSerializable<T>) NAMED_DESERIALIZER_MAP.get(clazz);
     }
 
     static boolean hasDeserializer(Class<?> clazz) {
-        return !DESERIALIZER_MAP.containsKey(clazz);
+        return !NAMED_DESERIALIZER_MAP.containsKey(clazz);
     }
 
     static boolean hasDeserializer(Object obj) {
         return hasDeserializer(obj.getClass());
     }
 
-    IDeserializer newInstance(byte[] bytes) throws IOException;
-    default IDeserializer newInstance(Byte[] bytes) throws IOException {
-        return newInstance(NativeArrayUtil.toNativeArray(bytes));
+    static INamedDeserializer createDefault(byte[] bytes, boolean isCompressed) throws IOException {
+        if (isCompressed)
+            return new NamedBinaryDeserializer(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
+        return new NamedBinaryDeserializer(bytes);
     }
 
-    IDeserializer newInstanceFromCompressed(byte[] bytes) throws IOException;
-    default IDeserializer newInstanceFromCompressed(Byte[] bytes) throws IOException {
-        return newInstanceFromCompressed(NativeArrayUtil.toNativeArray(bytes));
+    static INamedDeserializer createDefault(Byte[] bytes, boolean isCompressed) throws IOException {
+        return createDefault(NativeArrayUtil.toNativeArray(bytes), isCompressed);
+    }
+
+    default INamedDeserializer newInstance(byte[] bytes) throws IOException {
+        return newInstance(bytes, false);
+    }
+
+    default INamedDeserializer newInstance(Byte[] bytes) throws IOException {
+        return newInstance(bytes, false);
+    }
+
+    INamedDeserializer newInstance(byte[] bytes, boolean isCompressed) throws IOException;
+    default INamedDeserializer newInstance(Byte[] bytes, boolean isCompressed) throws IOException {
+        return newInstance(NativeArrayUtil.toNativeArray(bytes), isCompressed);
     }
 
     byte readByte(String name);
@@ -96,15 +113,21 @@ public interface IDeserializer {
     CompoundObject readCompoundObject(String name);
     CompoundObject[] readCompoundObjectArray(String name);
 
-    <T extends RawDataSerializable> T readRawObject(Class<T> type, String name) ;
-    <T extends RawDataSerializable> T[] readRawObjectArray(Class<T> type, String name);
+    <T extends IDataStreamSerializable> T readRawObject(Class<T> type, String name) ;
+    <T extends IDataStreamSerializable> T[] readRawObjectArray(Class<T> type, String name);
 
-    <T extends BinSerializable> T readObject(Class<T> type, String name);
-    <T extends BinSerializable> T[] readObjectArray(Class<T> type, String name);
+    <T extends INamedSerializable> T readNamedObject(Class<T> type, String name);
+    <T extends INamedSerializable> T[] readNamedObjectArray(Class<T> type, String name);
+
+    <T extends IUnNamedSerializable> T readUnNamedObject(Class<T> type, String name);
+    <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(Class<T> type, String name);
 
     <T> T readCustomObject(Class<T> type, String name);
     <T> T[] readCustomObjectArray(Class<T> type, String name);
 
     Object getObject(String name);
 
+    int getObjectCount();
+
+    String[] getKeys();
 }

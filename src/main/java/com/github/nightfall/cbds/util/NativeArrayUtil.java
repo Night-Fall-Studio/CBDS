@@ -1,5 +1,7 @@
 package com.github.nightfall.cbds.util;
 
+import java.io.DataOutputStream;
+
 public class NativeArrayUtil {
 
     public static byte[] toNativeArray(Byte[] array) {
@@ -50,16 +52,4 @@ public class NativeArrayUtil {
         return pArray;
     }
 
-    public static int[] intArrayFromChars(char[] array) {
-        int[] pArray = new int[array.length];
-        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
-        return pArray;
-    }
-
-    public static char[] charArrayFromInts(int[] array) {
-        char[] pArray = new char[array.length];
-        for (int i = 0; i < pArray.length; i++) pArray[i] = (char) array[i];
-        return pArray;
-    }
-    
 }

@@ -1,15 +1,17 @@
 package com.github.nightfall.cbds;
 
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 import com.github.nightfall.cbds.util.LogWrapper;
 import com.github.nightfall.cbds.util.VanillaLogWrapper;
 
 import java.util.ServiceLoader;
+import java.util.function.Consumer;
 
-@SuppressWarnings("rawtypes")
 public class CBDSConstants {
 
     public static LogWrapper LOGGER = new VanillaLogWrapper();
@@ -18,29 +20,21 @@ public class CBDSConstants {
     public static boolean allowDeserializerOverwriting = true;
 
     public static void init() {
-        // Initializing deserializers from other jars
-        ServiceLoader<CustomDeserializer> deserializers = ServiceLoader.load(CustomDeserializer.class);
-        for (CustomDeserializer<?> deserializer : deserializers) {
-            IDeserializer.registerDeserializer(deserializer);
-        }
+        register(INamedCustomSerializable.class, INamedSerializer::registerSerializer);
+        register(INamedCustomSerializable.class, INamedDeserializer::registerDeserializer);
 
-        // Initializing deserializers from this jar
-        deserializers = ServiceLoader.loadInstalled(CustomDeserializer.class);
-        for (CustomDeserializer<?> deserializer : deserializers) {
-            IDeserializer.registerDeserializer(deserializer);
-        }
+        register(IUnNamedCustomSerializable.class, IUnNamedSerializer::registerSerializer);
+        register(IUnNamedCustomSerializable.class, IUnNamedDeserializer::registerDeserializer);
+    }
 
-        // Initializing serializers from other jars
-        ServiceLoader<CustomSerializer> serializers = ServiceLoader.load(CustomSerializer.class);
-        for (CustomSerializer<?> serializer : serializers) {
-            ISerializer.registerSerializer(serializer);
-        }
+    public static <T> void register(Class<T> clazz, Consumer<T> method) {
+        // Init from other jars
+        ServiceLoader<T> objs = ServiceLoader.load(clazz);
+        for (T obj : objs)  method.accept(obj);
 
-        // Initializing serializers from this jar
-        serializers = ServiceLoader.loadInstalled(CustomSerializer.class);
-        for (CustomSerializer<?> serializer : serializers) {
-            ISerializer.registerSerializer(serializer);
-        }
+        // Init from this jar
+        objs = ServiceLoader.loadInstalled(clazz);
+        for (T obj : objs) method.accept(obj);
     }
 
 }

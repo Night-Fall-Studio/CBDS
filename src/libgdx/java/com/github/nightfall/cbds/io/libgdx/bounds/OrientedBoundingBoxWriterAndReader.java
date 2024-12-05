@@ -3,27 +3,44 @@ package com.github.nightfall.cbds.io.libgdx.bounds;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
+import com.badlogic.gdx.math.collision.Sphere;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 
 import java.io.IOException;
 
-public class OrientedBoundingBoxWriterAndReader implements CustomSerializer<OrientedBoundingBox>, CustomDeserializer<OrientedBoundingBox> {
+public class OrientedBoundingBoxWriterAndReader implements INamedCustomSerializable<OrientedBoundingBox>, IUnNamedCustomSerializable<OrientedBoundingBox> {
 
     @Override
-    public void write(ISerializer serializer, OrientedBoundingBox obj) throws IOException {
+    public void write(INamedSerializer serializer, OrientedBoundingBox obj) throws IOException {
         serializer.writeCustomObject("bounds", obj.getBounds());
         serializer.writeCustomObject("transform", obj.transform);
     }
 
     @Override
-    public OrientedBoundingBox read(IDeserializer deserializer) {
+    public OrientedBoundingBox read(INamedDeserializer deserializer) {
         return new OrientedBoundingBox(
                 deserializer.readCustomObject(BoundingBox.class, "bounds"),
                 deserializer.readCustomObject(Matrix4.class, "transform")
         );
+    }
+
+    @Override
+    public OrientedBoundingBox read(IUnNamedDeserializer in) throws IOException {
+        return new OrientedBoundingBox(
+                in.readCustomObject(BoundingBox.class),
+                in.readCustomObject(Matrix4.class)
+        );
+    }
+
+    @Override
+    public void write(IUnNamedSerializer out, OrientedBoundingBox obj) throws IOException {
+        out.writeCustomObject(obj.getBounds());
+        out.writeCustomObject(obj.transform);
     }
 
     @Override

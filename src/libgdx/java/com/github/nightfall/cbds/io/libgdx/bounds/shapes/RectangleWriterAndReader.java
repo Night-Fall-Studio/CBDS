@@ -1,17 +1,19 @@
 package com.github.nightfall.cbds.io.libgdx.bounds.shapes;
 
 import com.badlogic.gdx.math.Rectangle;
-import com.github.nightfall.cbds.io.custom.CustomDeserializer;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.serial.api.IDeserializer;
-import com.github.nightfall.cbds.io.serial.api.ISerializer;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 
 import java.io.IOException;
 
-public class RectangleWriterAndReader implements CustomSerializer<Rectangle>, CustomDeserializer<Rectangle> {
+public class RectangleWriterAndReader implements INamedCustomSerializable<Rectangle>, IUnNamedCustomSerializable<Rectangle> {
 
     @Override
-    public void write(ISerializer serializer, Rectangle obj) throws IOException {
+    public void write(INamedSerializer serializer, Rectangle obj) throws IOException {
         serializer.writeFloat("x", obj.x);
         serializer.writeFloat("y", obj.y);
         serializer.writeFloat("width", obj.width);
@@ -19,7 +21,7 @@ public class RectangleWriterAndReader implements CustomSerializer<Rectangle>, Cu
     }
 
     @Override
-    public Rectangle read(IDeserializer deserializer) {
+    public Rectangle read(INamedDeserializer deserializer) {
         return new Rectangle(
                 deserializer.readFloat("x"),
                 deserializer.readFloat("y"),
@@ -28,6 +30,23 @@ public class RectangleWriterAndReader implements CustomSerializer<Rectangle>, Cu
         );
     }
 
+    @Override
+    public Rectangle read(IUnNamedDeserializer in) throws IOException{
+        return new Rectangle(
+                in.readFloat(),
+                in.readFloat(),
+                in.readFloat(),
+                in.readFloat()
+        );
+    }
+
+    @Override
+    public void write(IUnNamedSerializer out, Rectangle obj) throws IOException {
+        out.writeFloat(obj.x);
+        out.writeFloat(obj.y);
+        out.writeFloat(obj.width);
+        out.writeFloat(obj.height);
+    }
 
     @Override
     public Class<Rectangle> getSerializableType() {

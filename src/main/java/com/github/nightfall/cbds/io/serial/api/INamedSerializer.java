@@ -2,37 +2,43 @@ package com.github.nightfall.cbds.io.serial.api;
 
 import com.github.nightfall.cbds.CBDSConstants;
 import com.github.nightfall.cbds.io.CompoundObject;
-import com.github.nightfall.cbds.io.custom.CustomSerializer;
-import com.github.nightfall.cbds.io.obj.BinSerializable;
-import com.github.nightfall.cbds.io.obj.RawDataSerializable;
+import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.impl.NamedBinarySerializer;
+import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
 
-public interface ISerializer {
+public interface INamedSerializer {
 
-    HashMap<Class<?>, CustomSerializer<?>> SERIALIZER_MAP = new HashMap<>();
+    HashMap<Class<?>, INamedCustomSerializable<?>> NAMED_SERIALIZER_MAP = new HashMap<>();
 
-    static void registerSerializer(CustomSerializer<?> serializer) {
-        if (ISerializer.hasSerializer(serializer.getSerializableType()) && !CBDSConstants.allowSerializerOverwriting) CBDSConstants.LOGGER.warn("Cannot overwrite pre-existing serializers, try turning \"com.github.nightfall.cbds.CBDSConstants.allowSerializerOverwriting\" true.");
+    static void registerSerializer(INamedCustomSerializable<?> serializer) {
+        if (INamedSerializer.hasSerializer(serializer.getSerializableType()) && !CBDSConstants.allowSerializerOverwriting) CBDSConstants.LOGGER.warn("Cannot overwrite pre-existing serializers, try turning \"com.github.nightfall.cbds.CBDSConstants.allowSerializerOverwriting\" true.");
         if (serializer.getSerializableType().isArray()) throw new RuntimeException("cannot register serializer of array type, I recommend registering the component type instead.");
-        SERIALIZER_MAP.put(serializer.getSerializableType(), serializer);
+        NAMED_SERIALIZER_MAP.put(serializer.getSerializableType(), serializer);
     }
 
-    static <T> CustomSerializer<T> getSerializer(Class<T> clazz) {
-        return (CustomSerializer<T>) SERIALIZER_MAP.get(clazz);
+    static <T> INamedCustomSerializable<T> getSerializer(Class<T> clazz) {
+        return (INamedCustomSerializable<T>) NAMED_SERIALIZER_MAP.get(clazz);
     }
 
     static boolean hasSerializer(Class<?> clazz) {
-        return !SERIALIZER_MAP.containsKey(clazz);
+        return !NAMED_SERIALIZER_MAP.containsKey(clazz);
     }
 
     static boolean hasSerializer(Object obj) {
         return hasSerializer(obj.getClass());
     }
 
-    ISerializer newInstance() throws IOException;
+    static INamedSerializer createDefault() {
+        return new NamedBinarySerializer();
+    }
+
+    INamedSerializer newInstance();
 
     void writeByte(String name, byte i) throws IOException;
     void writeByteArray(String name, byte[] array) throws IOException;
@@ -86,17 +92,20 @@ public interface ISerializer {
     void writeStringArray(String name, String[] array) throws IOException;
 
     default void writeCompoundObject(String name, CompoundObject object) throws IOException {
-        writeObject(name, object);
+        this.writeNamedObject(name, object);
     }
     default void writeCompoundObjectArray(String name, CompoundObject[] array) throws IOException {
-        writeObjectArray(name, array);
+        this.writeNamedObjectArray(name, array);
     }
 
-    <T extends RawDataSerializable> void writeRawObject(String name, T object) throws IOException;
-    <T extends RawDataSerializable> void writeRawObjectArray(String name, T[] array) throws IOException;
+    <T extends IDataStreamSerializable> void writeRawObject(String name, T object) throws IOException;
+    <T extends IDataStreamSerializable> void writeRawObjectArray(String name, T[] array) throws IOException;
 
-    <T extends BinSerializable> void writeObject(String name, T object) throws IOException;
-    <T extends BinSerializable> void writeObjectArray(String name, T[] array) throws IOException;
+    <T extends INamedSerializable> void writeNamedObject(String name, T object) throws IOException;
+    <T extends INamedSerializable> void writeNamedObjectArray(String name, T[] array) throws IOException;
+
+    <T extends IUnNamedSerializable> void writeUnNamedObject(String name, T object) throws IOException;
+    <T extends IUnNamedSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException;
 
     <T> void writeCustomObject(String name, T object) throws IOException;
     <T> void writeCustomObjectArray(String name, T[] array) throws IOException;
@@ -104,7 +113,7 @@ public interface ISerializer {
     byte[] toBytes() throws IOException;
     byte[] toCompressedBytes() throws IOException;
 
-    byte[] toBase64() throws IOException;
-    byte[] toCompressedBase64() throws IOException;
+    String toBase64() throws IOException;
+    String toCompressedBase64() throws IOException;
 
 }
