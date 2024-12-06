@@ -69,6 +69,8 @@ dependencies {
 tasks.register("buildSourceJar", Jar) {
     group = "cbds"
     from sourceSets.main.allSource
+
+    setArchiveFileName("${p_name}-${version}-source.jar")
 }
 
 tasks.register("buildCBDSJar", Jar) {
@@ -93,7 +95,7 @@ publishing {
 
             artifact source: buildCBDSJar, extension: 'jar'
             artifact source: buildLibgdx, extension: 'jar', classifier: "libgdx"
-            artifact source: buildSourceJar, extension: 'jar'
+            artifact source: buildSourceJar, extension: 'jar', classifier: "source"
         }
     }
 }
