@@ -67,7 +67,22 @@ dependencies {
 }
 
 tasks.register("buildSourceJar", Jar) {
+    group = "cbds"
     from sourceSets.main.allSource
+}
+
+tasks.register("buildCBDSJar", Jar) {
+    group = "cbds"
+    from(sourceSets.main.output, sourceSets.main.output)
+
+    setArchiveFileName("${p_name}-${version}.jar")
+}
+
+tasks.register("buildLibgdx", Jar) {
+    group = "cbds"
+    from(sourceSets.libgdx.output, sourceSets.libgdx.output)
+
+    setArchiveFileName("${p_name}-${version}-libgdx.jar")
 }
 
 publishing {
@@ -76,7 +91,8 @@ publishing {
             groupId = group
             artifactId = name
 
-            artifact source: jar, extension: 'jar'
+            artifact source: buildCBDSJar, extension: 'jar'
+            artifact source: buildLibgdx, extension: 'jar', classifier: "libgdx"
             artifact source: buildSourceJar, extension: 'jar'
         }
     }
