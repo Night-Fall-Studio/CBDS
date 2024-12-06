@@ -97,8 +97,9 @@ public class Main {
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to write " + objCount + " objects to UCBDS");
 
         startTime = System.nanoTime();
+        crSerializer.writeObjArray("testObjs", objs);
         for (int i = 0; i < objCount; i++) {
-            crSerializer.writeObj("testObj_" + i, new TestObject());
+//            crSerializer.writeObj("testObj_" + i, new TestObject());
 //            crSerializer.writeLong("testLong_" + i, random.nextLong());
 //            crSerializer.writeString("testString0_" + i, random.nextLong() + "");
 //            crSerializer.writeString("testString1_" + i, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
@@ -137,20 +138,25 @@ public class Main {
         final byte[] UCBDS_B64_COMPRESSED_BYTES = runCBDSSerializationBenchmark(userializer, SerializationStyle.COMPRESSED_B64);
         calculateSizeDiff(UCBDS_B64_REGULAR_BYTES.length, UCBDS_B64_COMPRESSED_BYTES.length, "UCBDS B64_Regular with size %d bytes and UCBDS B64_Compressed with size %d bytes changed by %.2f$per");
 
+        System.out.println();
+
+        startTime = System.nanoTime();
         INamedDeserializer deserializer = INamedDeserializer.createDefault(CBDS_REGULAR_BYTES, false);
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize CBDS");
+        startTime = System.nanoTime();
         deserializer.readNamedObjectArray("testObjs", TestObject.class);
-//        System.out.println("Object Count: " + deserializer.getObjectCount());
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from CBDS");
 
+        startTime = System.nanoTime();
         CRBinDeserializer deserializer1 = CRBinDeserializer.fromBase64(new String(CRBIN_B64_REGULAR_BYTES));
-        deserializer1.readObj("testObj_399", TestObject.class);
-
-//        startTime = System.nanoTime();
-//        IDeserializer deserializer = BinDeserializer.fromCompressedBytes(bytesC);
-//        object = deserializer.readObject(CompoundObject.class, "compound");
-//        endTime = System.nanoTime();
-//        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize");
-//        System.out.println("After Deserialization: " + object.readString("test"));
-//        System.out.println("After Deserialization key count: " + object.getObjectCount());
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize CRBIN");
+        startTime = System.nanoTime();
+        deserializer1.readObjArray("testObjs", TestObject.class);
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from CRBIN");
     }
 
     public static void calculateSizeDiff(int largest, int smallest, String message) {

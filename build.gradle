@@ -93,7 +93,7 @@ publishing {
             groupId = group
             artifactId = name
 
-            artifact source: buildCBDSJar, extension: 'jar'
+            artifact source: jar, extension: 'jar'
             artifact source: buildLibgdx, extension: 'jar', classifier: "libgdx"
             artifact source: buildSourceJar, extension: 'jar', classifier: "source"
         }

@@ -23,7 +23,6 @@ public class TestObject implements INamedSerializable, ICRBinSerializable {
 
     @Override
     public void read(INamedDeserializer deserializer) throws IOException {
-        System.out.println(deserializer.readString("test_key2"));
     }
 
     @Override
@@ -38,7 +37,6 @@ public class TestObject implements INamedSerializable, ICRBinSerializable {
 
     @Override
     public void read(CRBinDeserializer deserializer) {
-        System.out.println(deserializer.readString("test_key2"));
     }
 
     @Override
