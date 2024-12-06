@@ -3,14 +3,17 @@ package com.github.nightfall.cbds.io.serial.api;
 import com.github.nightfall.cbds.CBDSConstants;
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.serial.impl.NamedBinaryDeserializer;
 import com.github.nightfall.cbds.io.serial.impl.UnNamedBinaryDeserializer;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.zip.GZIPInputStream;
 
 public interface IUnNamedDeserializer {
 
@@ -35,11 +38,13 @@ public interface IUnNamedDeserializer {
     }
 
     static IUnNamedDeserializer createDefault(byte[] bytes, boolean isCompressed) throws IOException {
+        if (isCompressed)
+            return new UnNamedBinaryDeserializer(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
         return new UnNamedBinaryDeserializer(bytes);
     }
 
     static IUnNamedDeserializer createDefault(Byte[] bytes, boolean isCompressed) throws IOException {
-        return new UnNamedBinaryDeserializer(NativeArrayUtil.toNativeArray(bytes));
+        return createDefault(NativeArrayUtil.toNativeArray(bytes), isCompressed);
     }
 
     default IUnNamedDeserializer newInstance(byte[] bytes) throws IOException {

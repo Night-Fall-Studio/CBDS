@@ -2,6 +2,7 @@ package com.github.nightfall.cbds;
 
 import com.github.nightfall.cbds.cr.*;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinaryDeserializer;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinarySerializer;
@@ -76,34 +77,18 @@ public class Main {
         for (int i = 0; i < objs.length; i++) objs[i] = new TestObject();
 
         startTime = System.nanoTime();
-//        for (int i = 0; i < objCount; i++) {
-//            serializer.writeNamedObject("testObj_" + i, new TestObject());
-////            serializer.writeLong("testLong_" + i, random.nextLong());
-////            serializer.writeString("testString0_" + i, random.nextLong() + "");
-////            serializer.writeString("testString1_" + i, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-//        }
-        serializer.writeNamedObjectArray("testObjs", objs);
+        serializer.writeUnNamedObjectArray("testObjs", objs);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to write " + objCount + " objects to CBDS");
 
         startTime = System.nanoTime();
-        for (int i = 0; i < objCount; i++) {
-            userializer.writeNamedObject(new TestObject());
-//            userializer.writeLong(random.nextLong());
-//            userializer.writeString(random.nextLong() + "");
-//            userializer.writeString("++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        }
+        userializer.writeUnNamedObjectArray(objs);
+
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to write " + objCount + " objects to UCBDS");
 
         startTime = System.nanoTime();
         crSerializer.writeObjArray("testObjs", objs);
-        for (int i = 0; i < objCount; i++) {
-//            crSerializer.writeObj("testObj_" + i, new TestObject());
-//            crSerializer.writeLong("testLong_" + i, random.nextLong());
-//            crSerializer.writeString("testString0_" + i, random.nextLong() + "");
-//            crSerializer.writeString("testString1_" + i, "++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        }
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to write " + objCount + " objects to CRBIN");
 
@@ -145,16 +130,51 @@ public class Main {
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize CBDS");
         startTime = System.nanoTime();
-        deserializer.readNamedObjectArray("testObjs", TestObject.class);
+        deserializer.readUnNamedObjectArray("testObjs", TestObject.class);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from CBDS");
 
+        System.out.println();
+
         startTime = System.nanoTime();
-        CRBinDeserializer deserializer1 = CRBinDeserializer.fromBase64(new String(CRBIN_B64_REGULAR_BYTES));
+        INamedDeserializer deserializerc = INamedDeserializer.createDefault(CBDS_COMPRESSED_BYTES, true);
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize COMPRESSED CBDS");
+        startTime = System.nanoTime();
+        deserializerc.readUnNamedObjectArray("testObjs", TestObject.class);
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from COMPRESSED CBDS");
+
+        System.out.println();
+
+        startTime = System.nanoTime();
+        IUnNamedDeserializer deserializer0 = IUnNamedDeserializer.createDefault(UCBDS_REGULAR_BYTES, false);
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize UCBDS");
+        startTime = System.nanoTime();
+        deserializer0.readUnNamedObjectArray(TestObject.class);
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from UCBDS");
+
+        System.out.println();
+
+        startTime = System.nanoTime();
+        IUnNamedDeserializer deserializer1 = IUnNamedDeserializer.createDefault(UCBDS_COMPRESSED_BYTES, true);
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize COMPRESSED UCBDS");
+        startTime = System.nanoTime();
+        deserializer1.readUnNamedObjectArray(TestObject.class);
+        endTime = System.nanoTime();
+        System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from COMPRESSED UCBDS");
+
+        System.out.println();
+
+        startTime = System.nanoTime();
+        CRBinDeserializer crBinDeserializer = CRBinDeserializer.fromBase64(new String(CRBIN_B64_REGULAR_BYTES));
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize CRBIN");
         startTime = System.nanoTime();
-        deserializer1.readObjArray("testObjs", TestObject.class);
+        crBinDeserializer.readObjArray("testObjs", TestObject.class);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from CRBIN");
     }
