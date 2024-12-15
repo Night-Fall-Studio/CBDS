@@ -5,8 +5,8 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -23,12 +23,12 @@ public class ShortArrayWriterAndReader implements INamedCustomSerializable<Short
     }
 
     @Override
-    public ShortArray read(IUnNamedDeserializer in) throws IOException{
+    public ShortArray read(IKeylessDeserializer in) throws IOException{
         return new ShortArray(in.readShortArrayAsPrimitive());
     }
 
     @Override
-    public void write(IUnNamedSerializer out, ShortArray obj) throws IOException {
+    public void write(IKeylessSerializer out, ShortArray obj) throws IOException {
         out.writeShortArray(obj.items);
     }
 

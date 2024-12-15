@@ -4,26 +4,20 @@ import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.serial.SerializationType;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 import com.github.nightfall.cbds.util.ThrowableSupplier;
 
-import java.io.ByteArrayInputStream;
-import java.io.DataInputStream;
-import java.io.EOFException;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Function;
-import java.util.zip.DataFormatException;
-import java.util.zip.Deflater;
 import java.util.zip.GZIPInputStream;
-import java.util.zip.Inflater;
 
 import static com.github.nightfall.cbds.io.serial.SerializationType.*;
 
@@ -43,7 +37,9 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     }
 
     public static NamedBinaryDeserializer fromBytes(byte[] bytes, boolean isCompressed) throws IOException {
-        if (isCompressed) return new NamedBinaryDeserializer(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
+        if (isCompressed) {
+            return new NamedBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
+        }
         else return fromBytes(bytes);
     }
 
@@ -73,60 +69,198 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
             Object obj = null;
 
             switch (type) {
-                case STRING_SCHEMA_sBYTE, STRING_SCHEMA_sSHORT, STRING_SCHEMA_sINT -> {
+                case STRING_SCHEMA_sBYTE:
+                case STRING_SCHEMA_sSHORT:
+                case STRING_SCHEMA_sINT: {
                     isUsingStringSchema.set(true);
-                    schema.addAll(List.of(readArray(String[]::new, this::readString, STRING_SCHEMA_sBYTE, type)));
+                    schema.addAll(Arrays.asList(readArray(String[]::new, this::readString, STRING_SCHEMA_sBYTE, type)));
                     continue;
                 }
-                case BYTE -> obj = input.readByte();
-                case BYTE_ARRAY_sBYTE, BYTE_ARRAY_sSHORT, BYTE_ARRAY_sINT -> obj = readArray(Byte[]::new, input::readByte, BYTE_ARRAY_sBYTE, type);
-                case SHORT_sBYTE, SHORT_sSHORT -> obj = getNumber(SHORT_sBYTE, type);
-                case SHORT_ARRAY_sBYTE, SHORT_ARRAY_sSHORT, SHORT_ARRAY_sINT -> obj = readArray(Short[]::new, input::readShort, STRING_ARRAY_sBYTE, type);
-                case INT_sBYTE, INT_sSHORT, INT_sINT -> obj = getNumber(INT_sBYTE, type);
-                case INT_ARRAY_sBYTE, INT_ARRAY_sSHORT, INT_ARRAY_sINT -> obj = readArray(Integer[]::new, input::readInt, INT_ARRAY_sBYTE, type);
-                case LONG_sBYTE, LONG_sSHORT, LONG_sINT, LONG_sLONG -> obj = getNumber(LONG_sBYTE, type);
-                case LONG_ARRAY_sBYTE, LONG_ARRAY_sSHORT, LONG_ARRAY_sINT -> obj = readArray(Long[]::new, input::readLong, LONG_ARRAY_sBYTE, type);
-                case FLOAT -> obj = input.readFloat();
-                case FLOAT_ARRAY_sBYTE, FLOAT_ARRAY_sSHORT, FLOAT_ARRAY_sINT -> obj = readArray(Float[]::new, input::readFloat, FLOAT_ARRAY_sBYTE, type);
-                case DOUBLE -> obj = input.readDouble();
-                case DOUBLE_ARRAY_sBYTE, DOUBLE_ARRAY_sSHORT, DOUBLE_ARRAY_sINT -> obj = readArray(Double[]::new, input::readDouble, DOUBLE_ARRAY_sBYTE, type);
-                case BOOLEAN -> obj = input.readBoolean();
-                case BOOLEAN_ARRAY_sBYTE, BOOLEAN_ARRAY_sSHORT, BOOLEAN_ARRAY_sINT -> obj = readArray(Boolean[]::new, input::readBoolean, BOOLEAN_ARRAY_sBYTE, type);
-                case CHAR -> obj = input.readChar();
-                case CHAR_ARRAY_sBYTE, CHAR_ARRAY_sSHORT, CHAR_ARRAY_sINT -> obj = readArray(Character[]::new, input::readChar, CHAR_ARRAY_sBYTE, type);
-                case STRING_REGULAR -> obj = readString();
-                case STRING_sBYTE, STRING_sSHORT, STRING_sINT -> obj = schema.get(getIndex(STRING_sBYTE, type));
-                case STRING_ARRAY_sBYTE, STRING_ARRAY_sSHORT, STRING_ARRAY_sINT -> obj = readArray(String[]::new, () -> {
-                    if (isUsingStringSchema.get()) return schema.get(input.readInt());
-                    else return readString();
-                }, STRING_ARRAY_sBYTE, type);
 
-                case RAW_OBJECT_sBYTE, RAW_OBJECT_sSHORT, RAW_OBJECT_sINT -> obj = readArray(Byte[]::new, input::readByte, RAW_OBJECT_sBYTE, type);
-                case NAMED_OBJECT_sBYTE, NAMED_OBJECT_sSHORT, NAMED_OBJECT_sINT -> obj = newInstance(readArray(Byte[]::new, input::readByte, NAMED_OBJECT_sBYTE, type));
-                case UNNAMED_OBJECT_sBYTE, UNNAMED_OBJECT_sSHORT, UNNAMED_OBJECT_sINT -> obj = IUnNamedDeserializer.createDefault(readArray(Byte[]::new, input::readByte, UNNAMED_OBJECT_sBYTE, type), false);
-                case CUSTOM_OBJECT_sBYTE, CUSTOM_OBJECT_sSHORT, CUSTOM_OBJECT_sINT -> obj = newInstance(readArray(Byte[]::new, input::readByte, CUSTOM_OBJECT_sBYTE, type));
+                case BYTE: {
+                    obj = input.readByte();
+                    break;
+                }
 
-                case CUSTOM_OBJECT_ARRAY_sBYTE, CUSTOM_OBJECT_ARRAY_sSHORT, CUSTOM_OBJECT_ARRAY_sINT -> {
+                case BYTE_ARRAY_sBYTE:
+                case BYTE_ARRAY_sSHORT:
+                case BYTE_ARRAY_sINT: {
+                    obj = readArray(Byte[]::new, input::readByte, BYTE_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case SHORT_sBYTE:
+                case SHORT_sSHORT: {
+                    obj = getNumber(SHORT_sBYTE, type);
+                    break;
+                }
+
+                case SHORT_ARRAY_sBYTE:
+                case SHORT_ARRAY_sSHORT:
+                case SHORT_ARRAY_sINT: {
+                    obj = readArray(Short[]::new, input::readShort, STRING_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case INT_sBYTE:
+                case INT_sSHORT:
+                case INT_sINT: {
+                    obj = getNumber(INT_sBYTE, type);
+                    break;
+                }
+
+                case INT_ARRAY_sBYTE:
+                case INT_ARRAY_sSHORT:
+                case INT_ARRAY_sINT: {
+                    obj = readArray(Integer[]::new, input::readInt, INT_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case LONG_sBYTE:
+                case LONG_sSHORT:
+                case LONG_sINT:
+                case LONG_sLONG: {
+                    obj = getNumber(LONG_sBYTE, type);
+                    break;
+                }
+
+                case LONG_ARRAY_sBYTE:
+                case LONG_ARRAY_sSHORT:
+                case LONG_ARRAY_sINT: {
+                    obj = readArray(Long[]::new, input::readLong, LONG_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case FLOAT: {
+                    obj = input.readFloat();
+                    break;
+                }
+
+                case FLOAT_ARRAY_sBYTE:
+                case FLOAT_ARRAY_sSHORT:
+                case FLOAT_ARRAY_sINT: {
+                    obj = readArray(Float[]::new, input::readFloat, FLOAT_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case DOUBLE: {
+                    obj = input.readDouble();
+                    break;
+                }
+
+                case DOUBLE_ARRAY_sBYTE:
+                case DOUBLE_ARRAY_sSHORT:
+                case DOUBLE_ARRAY_sINT: {
+                    obj = readArray(Double[]::new, input::readDouble, DOUBLE_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case BOOLEAN: {
+                    obj = input.readBoolean();
+                    break;
+                }
+
+                case BOOLEAN_ARRAY_sBYTE:
+                case BOOLEAN_ARRAY_sSHORT:
+                case BOOLEAN_ARRAY_sINT: {
+                    obj = readArray(Boolean[]::new, input::readBoolean, BOOLEAN_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case CHAR: {
+                    obj = input.readChar();
+                    break;
+                }
+
+                case CHAR_ARRAY_sBYTE:
+                case CHAR_ARRAY_sSHORT:
+                case CHAR_ARRAY_sINT: {
+                    obj = readArray(Character[]::new, input::readChar, CHAR_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case STRING_REGULAR: {
+                    obj = readString();
+                    break;
+                }
+
+                case STRING_sBYTE:
+                case STRING_sSHORT:
+                case STRING_sINT: {
+                    obj = schema.get(getIndex(STRING_sBYTE, type));
+                    break;
+                }
+
+                case STRING_ARRAY_sBYTE:
+                case STRING_ARRAY_sSHORT:
+                case STRING_ARRAY_sINT: {
+                    obj = readArray(String[]::new, () -> {
+                        if (isUsingStringSchema.get()) return schema.get(input.readInt());
+                        else return readString();
+                    }, STRING_ARRAY_sBYTE, type);
+                    break;
+                }
+
+                case RAW_OBJECT_sBYTE:
+                case RAW_OBJECT_sSHORT:
+                case RAW_OBJECT_sINT: {
+                    obj = readArray(Byte[]::new, input::readByte, RAW_OBJECT_sBYTE, type);
+                    break;
+                }
+
+                case NAMED_OBJECT_sBYTE:
+                case NAMED_OBJECT_sSHORT:
+                case NAMED_OBJECT_sINT: {
+                    obj = newInstance(readArray(Byte[]::new, input::readByte, NAMED_OBJECT_sBYTE, type));
+                    break;
+                }
+
+                case UNNAMED_OBJECT_sBYTE:
+                case UNNAMED_OBJECT_sSHORT:
+                case UNNAMED_OBJECT_sINT: {
+                    obj = IKeylessDeserializer.createDefault(readArray(Byte[]::new, input::readByte, UNNAMED_OBJECT_sBYTE, type), false);
+                    break;
+                }
+
+                case CUSTOM_OBJECT_sBYTE:
+                case CUSTOM_OBJECT_sSHORT:
+                case CUSTOM_OBJECT_sINT: {
+                    obj = newInstance(readArray(Byte[]::new, input::readByte, CUSTOM_OBJECT_sBYTE, type));
+                    break;
+                }
+
+                case CUSTOM_OBJECT_ARRAY_sBYTE:
+                case CUSTOM_OBJECT_ARRAY_sSHORT:
+                case CUSTOM_OBJECT_ARRAY_sINT: {
                     obj = processObjectArray(CUSTOM_OBJECT_sBYTE, CUSTOM_OBJECT_ARRAY_sBYTE, type);
+                    break;
                 }
 
-                case NAMED_OBJECT_ARRAY_sBYTE, NAMED_OBJECT_ARRAY_sSHORT, NAMED_OBJECT_ARRAY_sINT -> {
+                case NAMED_OBJECT_ARRAY_sBYTE:
+                case NAMED_OBJECT_ARRAY_sSHORT:
+                case NAMED_OBJECT_ARRAY_sINT: {
                     obj = processObjectArray(NAMED_OBJECT_sBYTE, NAMED_OBJECT_ARRAY_sBYTE, type);
+                    break;
                 }
 
-                case UNNAMED_OBJECT_ARRAY_sBYTE, UNNAMED_OBJECT_ARRAY_sSHORT, UNNAMED_OBJECT_ARRAY_sINT -> {
-                    IUnNamedDeserializer[] deserializers = new IUnNamedDeserializer[getIndex(UNNAMED_OBJECT_ARRAY_sBYTE, type)];
+                case UNNAMED_OBJECT_ARRAY_sBYTE:
+                case UNNAMED_OBJECT_ARRAY_sSHORT:
+                case UNNAMED_OBJECT_ARRAY_sINT: {
+                    IKeylessDeserializer[] deserializers = new IKeylessDeserializer[getIndex(UNNAMED_OBJECT_ARRAY_sBYTE, type)];
 
                     for (int i = 0; i < deserializers.length; i++) {
                         SerializationType type0 = readType();
 
-                        deserializers[i] = IUnNamedDeserializer.createDefault(readArray(Byte[]::new, input::readByte, UNNAMED_OBJECT_sBYTE, type0), false);
+                        deserializers[i] = IKeylessDeserializer.createDefault(readArray(Byte[]::new, input::readByte, UNNAMED_OBJECT_sBYTE, type0), false);
                     }
 
                     obj = deserializers;
+                    break;
                 }
 
-                case RAW_OBJECT_ARRAY_sBYTE, RAW_OBJECT_ARRAY_sSHORT, RAW_OBJECT_ARRAY_sINT -> {
+                case RAW_OBJECT_ARRAY_sBYTE:
+                case RAW_OBJECT_ARRAY_sSHORT:
+                case RAW_OBJECT_ARRAY_sINT: {
                     Byte[][] deserializers = new Byte[input.readInt()][0];
 
                     for (int i = 0; i < deserializers.length; i++) {
@@ -136,6 +270,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
                     }
 
                     obj = deserializers;
+                    break;
                 }
             }
 
@@ -160,7 +295,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
         return deserializers;
     }
 
-    private <T> T[] readArray(Function<Integer, T[]> arrayCreator, ThrowableSupplier<T> supplier) throws IOException {
+    private <T> T[] readArray(Function<Integer, T[]> arrayCreator, ThrowableSupplier<T> supplier) throws Exception {
         T[] array = arrayCreator.apply(input.readInt());
         for (int i = 0; i < array.length; i++) {
             array[i] = supplier.get();
@@ -175,9 +310,18 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
         ThrowableSupplier<Number> getIndexMethod = input::readByte;
 
         switch (ordinal - cOrdinal) {
-            case 1 -> getIndexMethod = input::readShort;
-            case 2 -> getIndexMethod = input::readInt;
-            case 3 -> getIndexMethod = input::readLong;
+            case 1: {
+                getIndexMethod = input::readShort;
+                break;
+            }
+            case 2: {
+                getIndexMethod = input::readInt;
+                break;
+            }
+            case 3: {
+                getIndexMethod = input::readLong;
+                break;
+            }
         }
         return getIndexMethod.get();
     }
@@ -189,9 +333,18 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
         ThrowableSupplier<Number> getIndexMethod = input::readByte;
 
         switch (ordinal - cOrdinal) {
-            case 1 -> getIndexMethod = input::readShort;
-            case 2 -> getIndexMethod = input::readInt;
-            case 3 -> getIndexMethod = input::readLong;
+            case 1: {
+                getIndexMethod = input::readShort;
+                break;
+            }
+            case 2: {
+                getIndexMethod = input::readInt;
+                break;
+            }
+            case 3: {
+                getIndexMethod = input::readLong;
+                break;
+            }
         }
         return getIndexMethod.get().intValue();
     }
@@ -203,9 +356,18 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
         ThrowableSupplier<Number> getIndexMethod = input::readByte;
 
         switch (ordinal - cOrdinal) {
-            case 1 -> getIndexMethod = input::readShort;
-            case 2 -> getIndexMethod = input::readInt;
-            case 3 -> getIndexMethod = input::readLong;
+            case 1: {
+                getIndexMethod = input::readShort;
+                break;
+            }
+            case 2: {
+                getIndexMethod = input::readInt;
+                break;
+            }
+            case 3: {
+                getIndexMethod = input::readLong;
+                break;
+            }
         }
 
         int arrayLength = getIndexMethod.get().intValue();
@@ -365,10 +527,10 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     }
 
     @Override
-    public <T extends IUnNamedSerializable> T readUnNamedObject(String name, Class<T> type) {
+    public <T extends IKeylessSerializable> T readUnNamedObject(String name, Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
-            obj.read((IUnNamedDeserializer) keyToValue.get(name));
+            obj.read((IKeylessDeserializer) keyToValue.get(name));
             return obj;
         } catch (
                 InstantiationException | IllegalAccessException
@@ -381,8 +543,8 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     }
 
     @Override
-    public <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(String name, Class<T> type) {
-        IUnNamedDeserializer[] objs = (IUnNamedDeserializer[]) keyToValue.get(name);
+    public <T extends IKeylessSerializable> T[] readUnNamedObjectArray(String name, Class<T> type) {
+        IKeylessDeserializer[] objs = (IKeylessDeserializer[]) keyToValue.get(name);
         T[] t = (T[]) Array.newInstance(type, objs.length);
 
         for (int i = 0; i < t.length; i++) {

@@ -6,39 +6,45 @@ import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.impl.UnNamedBinarySerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 
 import java.io.IOException;
 import java.util.HashMap;
 
-public interface IUnNamedSerializer {
+/**
+ * The API class for the Keyless Serializers.
+ *
+ * @author Mr Zombii
+ * @since 1.0.0
+ */
+public interface IKeylessSerializer {
 
-    HashMap<Class<?>, IUnNamedCustomSerializable<?>> UNNAMED_SERIALIZER_MAP = new HashMap<>();
+    HashMap<Class<?>, IUnNamedCustomSerializable<?>> KEYLESS_SERIALIZER_MAP = new HashMap<>();
 
     static void registerSerializer(IUnNamedCustomSerializable<?> serializer) {
         if (INamedSerializer.hasSerializer(serializer.getSerializableType()) && !CBDSConstants.allowSerializerOverwriting) CBDSConstants.LOGGER.warn("Cannot overwrite pre-existing serializers, try turning \"com.github.nightfall.cbds.CBDSConstants.allowSerializerOverwriting\" true.");
         if (serializer.getSerializableType().isArray()) throw new RuntimeException("cannot register serializer of array type, I recommend registering the component type instead.");
-        UNNAMED_SERIALIZER_MAP.put(serializer.getSerializableType(), serializer);
+        KEYLESS_SERIALIZER_MAP.put(serializer.getSerializableType(), serializer);
     }
 
     static <T> IUnNamedCustomSerializable<T> getSerializer(Class<T> clazz) {
-        return (IUnNamedCustomSerializable<T>) UNNAMED_SERIALIZER_MAP.get(clazz);
+        return (IUnNamedCustomSerializable<T>) KEYLESS_SERIALIZER_MAP.get(clazz);
     }
 
     static boolean hasSerializer(Class<?> clazz) {
-        return !UNNAMED_SERIALIZER_MAP.containsKey(clazz);
+        return !KEYLESS_SERIALIZER_MAP.containsKey(clazz);
     }
 
     static boolean hasSerializer(Object obj) {
         return hasSerializer(obj.getClass());
     }
 
-    static IUnNamedSerializer createDefault() {
+    static IKeylessSerializer createDefault() {
         return new UnNamedBinarySerializer();
     }
 
-    IUnNamedSerializer newInstance();
+    IKeylessSerializer newInstance();
 
     void writeByte(byte i) throws IOException;
     void writeByteArray(byte[] array) throws IOException;
@@ -104,8 +110,8 @@ public interface IUnNamedSerializer {
     <T extends INamedSerializable> void writeNamedObject(T object) throws IOException;
     <T extends INamedSerializable> void writeNamedObjectArray(T[] array) throws IOException;
 
-    <T extends IUnNamedSerializable> void writeUnNamedObject(T object) throws IOException;
-    <T extends IUnNamedSerializable> void writeUnNamedObjectArray(T[] array) throws IOException;
+    <T extends IKeylessSerializable> void writeUnNamedObject(T object) throws IOException;
+    <T extends IKeylessSerializable> void writeUnNamedObjectArray(T[] array) throws IOException;
 
     <T> void writeCustomObject(T object) throws IOException;
     <T> void writeCustomObjectArray(T[] array) throws IOException;

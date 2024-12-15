@@ -6,7 +6,7 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinaryDeserializer;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 
 import java.io.ByteArrayInputStream;
@@ -38,7 +38,7 @@ public interface INamedDeserializer {
 
     static INamedDeserializer createDefault(byte[] bytes, boolean isCompressed) throws IOException {
         if (isCompressed)
-            return new NamedBinaryDeserializer(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
+            return new NamedBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
         return new NamedBinaryDeserializer(bytes);
     }
 
@@ -119,8 +119,8 @@ public interface INamedDeserializer {
     <T extends INamedSerializable> T readNamedObject(String name, Class<T> type);
     <T extends INamedSerializable> T[] readNamedObjectArray(String name, Class<T> type);
 
-    <T extends IUnNamedSerializable> T readUnNamedObject(String name, Class<T> type);
-    <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(String name, Class<T> type);
+    <T extends IKeylessSerializable> T readUnNamedObject(String name, Class<T> type);
+    <T extends IKeylessSerializable> T[] readUnNamedObjectArray(String name, Class<T> type);
 
     <T> T readCustomObject(String name, Class<T> type);
     <T> T[] readCustomObjectArray(String name, Class<T> type);

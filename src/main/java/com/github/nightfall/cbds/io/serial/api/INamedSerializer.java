@@ -6,7 +6,7 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinarySerializer;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 
 import java.io.IOException;
@@ -104,8 +104,8 @@ public interface INamedSerializer {
     <T extends INamedSerializable> void writeNamedObject(String name, T object) throws IOException;
     <T extends INamedSerializable> void writeNamedObjectArray(String name, T[] array) throws IOException;
 
-    <T extends IUnNamedSerializable> void writeUnNamedObject(String name, T object) throws IOException;
-    <T extends IUnNamedSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException;
+    <T extends IKeylessSerializable> void writeUnNamedObject(String name, T object) throws IOException;
+    <T extends IKeylessSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException;
 
     <T> void writeCustomObject(String name, T object) throws IOException;
     <T> void writeCustomObjectArray(String name, T[] array) throws IOException;

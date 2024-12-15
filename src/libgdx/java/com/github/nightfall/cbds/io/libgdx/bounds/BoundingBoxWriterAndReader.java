@@ -6,8 +6,8 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -28,7 +28,7 @@ public class BoundingBoxWriterAndReader implements INamedCustomSerializable<Boun
     }
 
     @Override
-    public BoundingBox read(IUnNamedDeserializer in) throws IOException{
+    public BoundingBox read(IKeylessDeserializer in) throws IOException{
         return new BoundingBox(
                 in.readCustomObject(Vector3.class),
                 in.readCustomObject(Vector3.class)
@@ -36,7 +36,7 @@ public class BoundingBoxWriterAndReader implements INamedCustomSerializable<Boun
     }
 
     @Override
-    public void write(IUnNamedSerializer out, BoundingBox obj) throws IOException {
+    public void write(IKeylessSerializer out, BoundingBox obj) throws IOException {
         out.writeCustomObject(obj.min);
         out.writeCustomObject(obj.max);
     }

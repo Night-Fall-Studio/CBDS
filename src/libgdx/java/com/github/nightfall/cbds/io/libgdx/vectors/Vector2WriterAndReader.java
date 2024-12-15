@@ -5,8 +5,8 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -27,7 +27,7 @@ public class Vector2WriterAndReader implements INamedCustomSerializable<Vector2>
     }
 
     @Override
-    public Vector2 read(IUnNamedDeserializer in) throws IOException{
+    public Vector2 read(IKeylessDeserializer in) throws IOException{
         return new Vector2(
                 in.readFloat(),
                 in.readFloat()
@@ -35,7 +35,7 @@ public class Vector2WriterAndReader implements INamedCustomSerializable<Vector2>
     }
 
     @Override
-    public void write(IUnNamedSerializer out, Vector2 obj) throws IOException {
+    public void write(IKeylessSerializer out, Vector2 obj) throws IOException {
         out.writeFloat(obj.x);
         out.writeFloat(obj.y);
     }

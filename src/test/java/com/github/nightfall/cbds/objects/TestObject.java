@@ -1,12 +1,12 @@
 package com.github.nightfall.cbds.objects;
 
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinarySerializer;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import finalforeach.cosmicreach.savelib.crbin.CRBinDeserializer;
 import finalforeach.cosmicreach.savelib.crbin.CRBinSerializer;
 import finalforeach.cosmicreach.savelib.crbin.ICRBinSerializable;
@@ -14,7 +14,7 @@ import finalforeach.cosmicreach.savelib.crbin.ICRBinSerializable;
 import java.io.IOException;
 import java.util.Random;
 
-public class TestObject implements INamedSerializable, IUnNamedSerializable, ICRBinSerializable {
+public class TestObject implements INamedSerializable, IKeylessSerializable, ICRBinSerializable {
 
     static final Random random = new Random();
     static final long[] longs = new long[200];
@@ -52,13 +52,13 @@ public class TestObject implements INamedSerializable, IUnNamedSerializable, ICR
     }
 
     @Override
-    public void read(IUnNamedDeserializer in) throws IOException {
+    public void read(IKeylessDeserializer in) throws IOException {
 
     }
 
     @Override
-    public void write(IUnNamedSerializer out) throws IOException {
+    public void write(IKeylessSerializer out) throws IOException {
         out.writeString("Hello2");
-
     }
+
 }

@@ -2,10 +2,10 @@ package com.github.nightfall.cbds.io.serial.impl;
 
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 import com.github.nightfall.cbds.util.ThrowableSupplier;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
-public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
+public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
 
     DataInputStream input;
     ByteArrayInputStream byteStream;
@@ -34,7 +34,7 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
     }
 
     public static UnNamedBinaryDeserializer fromBytes(byte[] bytes, boolean isCompressed) throws IOException {
-        if (isCompressed) return new UnNamedBinaryDeserializer(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
+        if (isCompressed) return new UnNamedBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
         else return fromBytes(bytes);
     }
 
@@ -48,7 +48,7 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
     }
 
     @Override
-    public IUnNamedDeserializer newInstance(byte[] bytes, boolean isCompressed) throws IOException {
+    public IKeylessDeserializer newInstance(byte[] bytes, boolean isCompressed) throws IOException {
         return fromBytes(bytes, isCompressed);
     }
 
@@ -213,7 +213,7 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
     }
 
     @Override
-    public <T extends IUnNamedSerializable> T readUnNamedObject(Class<T> type) throws IOException {
+    public <T extends IKeylessSerializable> T readUnNamedObject(Class<T> type) throws IOException {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
             obj.read(newInstance(readByteArrayAsPrimitive(), false));
@@ -229,7 +229,7 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
     }
 
     @Override
-    public <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(Class<T> type) throws IOException {
+    public <T extends IKeylessSerializable> T[] readUnNamedObjectArray(Class<T> type) throws IOException {
         int length = readInt();
         T[] t = (T[]) Array.newInstance(type, length);
         for (int i = 0; i < t.length; i++) {
@@ -240,10 +240,10 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
 
     @Override
     public <T> T readCustomObject(Class<T> type) throws IOException {
-        if (!UNNAMED_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
+        if (!KEYLESS_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         try {
-            return (T) UNNAMED_DESERIALIZER_MAP.get(type).read(newInstance(readByteArrayAsPrimitive()));
+            return (T) KEYLESS_DESERIALIZER_MAP.get(type).read(newInstance(readByteArrayAsPrimitive()));
         } catch (
                 IllegalArgumentException | SecurityException e
         ) {
@@ -253,7 +253,7 @@ public class UnNamedBinaryDeserializer implements IUnNamedDeserializer {
 
     @Override
     public <T> T[] readCustomObjectArray(Class<T> type) throws IOException {
-        if (!UNNAMED_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
+        if (!KEYLESS_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         int length = readInt();
         T[] t = (T[]) Array.newInstance(type, length);

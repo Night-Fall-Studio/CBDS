@@ -1,13 +1,12 @@
 package com.github.nightfall.cbds.io.libgdx.arrays;
 
 import com.badlogic.gdx.utils.IntArray;
-import com.badlogic.gdx.utils.ShortArray;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -24,12 +23,12 @@ public class IntArrayWriterAndReader implements INamedCustomSerializable<IntArra
     }
 
     @Override
-    public IntArray read(IUnNamedDeserializer in) throws IOException{
+    public IntArray read(IKeylessDeserializer in) throws IOException{
         return new IntArray(in.readIntArrayAsPrimitive());
     }
 
     @Override
-    public void write(IUnNamedSerializer out, IntArray obj) throws IOException {
+    public void write(IKeylessSerializer out, IntArray obj) throws IOException {
         out.writeIntArray(obj.items);
     }
 

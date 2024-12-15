@@ -5,9 +5,9 @@ import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.SerializationType;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
@@ -15,7 +15,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.zip.GZIPOutputStream;
 
-public class UnNamedBinarySerializer implements IUnNamedSerializer {
+public class UnNamedBinarySerializer implements IKeylessSerializer {
 
     final DataOutputStream output;
     final ByteArrayOutputStream byteStream;
@@ -30,7 +30,7 @@ public class UnNamedBinarySerializer implements IUnNamedSerializer {
     }
 
     @Override
-    public IUnNamedSerializer newInstance() {
+    public IKeylessSerializer newInstance() {
         return new UnNamedBinarySerializer();
     }
 
@@ -154,8 +154,8 @@ public class UnNamedBinarySerializer implements IUnNamedSerializer {
         }
     }
 
-    public <T extends IUnNamedSerializable> void writeUnNamedObject(T object) throws IOException {
-        IUnNamedSerializer miniSerializer = newInstance();
+    public <T extends IKeylessSerializable> void writeUnNamedObject(T object) throws IOException {
+        IKeylessSerializer miniSerializer = newInstance();
         object.write(miniSerializer);
 
         byte[] bytes = miniSerializer.toBytes();
@@ -163,7 +163,7 @@ public class UnNamedBinarySerializer implements IUnNamedSerializer {
         writeByteArray(miniSerializer.toBytes());
     }
 
-    public <T extends IUnNamedSerializable> void writeUnNamedObjectArray(T[] array) throws IOException {
+    public <T extends IKeylessSerializable> void writeUnNamedObjectArray(T[] array) throws IOException {
         output.writeInt(array.length);
         for (T obj : array) {
             writeUnNamedObject(obj);
@@ -171,10 +171,10 @@ public class UnNamedBinarySerializer implements IUnNamedSerializer {
     }
 
     public <T> void writeCustomObject(T object) throws IOException {
-        if (!UNNAMED_SERIALIZER_MAP.containsKey(object.getClass())) throw new RuntimeException("cannot serialize class of type \"" + object.getClass().getName() + "\" due to it not having a registered serializer.");
+        if (!KEYLESS_SERIALIZER_MAP.containsKey(object.getClass())) throw new RuntimeException("cannot serialize class of type \"" + object.getClass().getName() + "\" due to it not having a registered serializer.");
 
-        IUnNamedSerializer miniSerializer = newInstance();
-        IUnNamedCustomSerializable<T> serializer = IUnNamedSerializer.getSerializer((Class<T>) object.getClass());
+        IKeylessSerializer miniSerializer = newInstance();
+        IUnNamedCustomSerializable<T> serializer = IKeylessSerializer.getSerializer((Class<T>) object.getClass());
         serializer.write(miniSerializer, object);
 
         writeByteArray(miniSerializer.toBytes());

@@ -5,8 +5,8 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -23,12 +23,12 @@ public class Matrix4WriterAndReader implements INamedCustomSerializable<Matrix4>
     }
 
     @Override
-    public Matrix4 read(IUnNamedDeserializer in) throws IOException{
+    public Matrix4 read(IKeylessDeserializer in) throws IOException{
         return new Matrix4(in.readFloatArrayAsPrimitive());
     }
 
     @Override
-    public void write(IUnNamedSerializer out, Matrix4 obj) throws IOException {
+    public void write(IKeylessSerializer out, Matrix4 obj) throws IOException {
         out.writeFloatArray(obj.val);
     }
 

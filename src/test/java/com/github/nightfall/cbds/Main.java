@@ -2,9 +2,8 @@ package com.github.nightfall.cbds;
 
 import com.github.nightfall.cbds.cr.*;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
-import com.github.nightfall.cbds.io.serial.impl.NamedBinaryDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinarySerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.impl.UnNamedBinarySerializer;
@@ -69,7 +68,7 @@ public class Main {
         };
 
         INamedSerializer serializer = new NamedBinarySerializer();
-        IUnNamedSerializer userializer = new UnNamedBinarySerializer();
+        IKeylessSerializer userializer = new UnNamedBinarySerializer();
         CRBinSerializer crSerializer = new CRBinSerializer();
 
         int objCount = 400;
@@ -95,7 +94,6 @@ public class Main {
         System.out.println();
 
         final byte[] CRBIN_REGULAR_BYTES = runCRBINSerializationBenchmark(crSerializer, SerializationStyle.REGULAR);
-
         final byte[] CBDS_REGULAR_BYTES = runCBDSSerializationBenchmark(serializer, SerializationStyle.REGULAR);
         final byte[] CBDS_COMPRESSED_BYTES = runCBDSSerializationBenchmark(serializer, SerializationStyle.COMPRESSED);
         calculateSizeDiff(CBDS_REGULAR_BYTES.length, CBDS_COMPRESSED_BYTES.length, "CBDS Regular with size %d bytes and CBDS Compressed with size %d bytes changed by %.2f$per");
@@ -148,7 +146,7 @@ public class Main {
         System.out.println();
 
         startTime = System.nanoTime();
-        IUnNamedDeserializer deserializer0 = IUnNamedDeserializer.createDefault(UCBDS_REGULAR_BYTES, false);
+        IKeylessDeserializer deserializer0 = IKeylessDeserializer.createDefault(UCBDS_REGULAR_BYTES, false);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize UCBDS");
         startTime = System.nanoTime();
@@ -159,7 +157,7 @@ public class Main {
         System.out.println();
 
         startTime = System.nanoTime();
-        IUnNamedDeserializer deserializer1 = IUnNamedDeserializer.createDefault(UCBDS_COMPRESSED_BYTES, true);
+        IKeylessDeserializer deserializer1 = IKeylessDeserializer.createDefault(UCBDS_COMPRESSED_BYTES, true);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize COMPRESSED UCBDS");
         startTime = System.nanoTime();
@@ -203,7 +201,7 @@ public class Main {
         }
     }
 
-    public static byte[] runCBDSSerializationBenchmark(IUnNamedSerializer serializer, SerializationStyle style) {
+    public static byte[] runCBDSSerializationBenchmark(IKeylessSerializer serializer, SerializationStyle style) {
         ThrowableSupplier<byte[]> method = switch (style) {
             case REGULAR -> serializer::toBytes;
             case COMPRESSED -> serializer::toCompressedBytes;

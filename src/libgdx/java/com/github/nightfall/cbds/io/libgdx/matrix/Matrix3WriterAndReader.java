@@ -1,13 +1,12 @@
 package com.github.nightfall.cbds.io.libgdx.matrix;
 
 import com.badlogic.gdx.math.Matrix3;
-import com.badlogic.gdx.math.Matrix4;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -24,12 +23,12 @@ public class Matrix3WriterAndReader implements INamedCustomSerializable<Matrix3>
     }
 
     @Override
-    public Matrix3 read(IUnNamedDeserializer in) throws IOException{
+    public Matrix3 read(IKeylessDeserializer in) throws IOException{
         return new Matrix3(in.readFloatArrayAsPrimitive());
     }
 
     @Override
-    public void write(IUnNamedSerializer out, Matrix3 obj) throws IOException {
+    public void write(IKeylessSerializer out, Matrix3 obj) throws IOException {
         out.writeFloatArray(obj.val);
     }
 

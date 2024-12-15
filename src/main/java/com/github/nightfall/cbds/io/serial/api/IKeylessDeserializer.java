@@ -3,11 +3,10 @@ package com.github.nightfall.cbds.io.serial.api;
 import com.github.nightfall.cbds.CBDSConstants;
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
-import com.github.nightfall.cbds.io.serial.impl.NamedBinaryDeserializer;
 import com.github.nightfall.cbds.io.serial.impl.UnNamedBinaryDeserializer;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 
 import java.io.ByteArrayInputStream;
@@ -15,47 +14,47 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.zip.GZIPInputStream;
 
-public interface IUnNamedDeserializer {
+public interface IKeylessDeserializer {
 
-    HashMap<Class<?>, IUnNamedCustomSerializable<?>> UNNAMED_DESERIALIZER_MAP = new HashMap<>();
+    HashMap<Class<?>, IUnNamedCustomSerializable<?>> KEYLESS_DESERIALIZER_MAP = new HashMap<>();
 
     static void registerDeserializer(IUnNamedCustomSerializable<?> deserializer) {
         if (hasDeserializer(deserializer.getSerializableType()) && !CBDSConstants.allowDeserializerOverwriting) CBDSConstants.LOGGER.warn("Cannot overwrite pre-existing serializers, try turning \"com.github.nightfall.cbds.CBDSConstants.allowDeserializerOverwriting\" true.");
         if (deserializer.getSerializableType().isArray()) throw new RuntimeException("cannot register deserializer of array type, I recommend registering the component type instead.");
-        UNNAMED_DESERIALIZER_MAP.put(deserializer.getSerializableType(), deserializer);
+        KEYLESS_DESERIALIZER_MAP.put(deserializer.getSerializableType(), deserializer);
     }
 
     static <T> IUnNamedCustomSerializable<T> getDeserializer(Class<T> clazz) {
-        return (IUnNamedCustomSerializable<T>) UNNAMED_DESERIALIZER_MAP.get(clazz);
+        return (IUnNamedCustomSerializable<T>) KEYLESS_DESERIALIZER_MAP.get(clazz);
     }
 
     static boolean hasDeserializer(Class<?> clazz) {
-        return !UNNAMED_DESERIALIZER_MAP.containsKey(clazz);
+        return !KEYLESS_DESERIALIZER_MAP.containsKey(clazz);
     }
 
     static boolean hasDeserializer(Object obj) {
         return hasDeserializer(obj.getClass());
     }
 
-    static IUnNamedDeserializer createDefault(byte[] bytes, boolean isCompressed) throws IOException {
+    static IKeylessDeserializer createDefault(byte[] bytes, boolean isCompressed) throws IOException {
         if (isCompressed)
-            return new UnNamedBinaryDeserializer(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
+            return new UnNamedBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
         return new UnNamedBinaryDeserializer(bytes);
     }
 
-    static IUnNamedDeserializer createDefault(Byte[] bytes, boolean isCompressed) throws IOException {
+    static IKeylessDeserializer createDefault(Byte[] bytes, boolean isCompressed) throws IOException {
         return createDefault(NativeArrayUtil.toNativeArray(bytes), isCompressed);
     }
 
-    default IUnNamedDeserializer newInstance(byte[] bytes) throws IOException {
+    default IKeylessDeserializer newInstance(byte[] bytes) throws IOException {
         return newInstance(bytes, false);
     }
-    default IUnNamedDeserializer newInstance(Byte[] bytes) throws IOException {
+    default IKeylessDeserializer newInstance(Byte[] bytes) throws IOException {
         return newInstance(NativeArrayUtil.toNativeArray(bytes));
     }
 
-    IUnNamedDeserializer newInstance(byte[] bytes, boolean isCompressed) throws IOException;
-    default IUnNamedDeserializer newInstance(Byte[] bytes, boolean isCompressed) throws IOException {
+    IKeylessDeserializer newInstance(byte[] bytes, boolean isCompressed) throws IOException;
+    default IKeylessDeserializer newInstance(Byte[] bytes, boolean isCompressed) throws IOException {
         return newInstance(NativeArrayUtil.toNativeArray(bytes), isCompressed);
     }
 
@@ -119,8 +118,8 @@ public interface IUnNamedDeserializer {
     <T extends INamedSerializable> T readNamedObject(Class<T> type) throws IOException;
     <T extends INamedSerializable> T[] readNamedObjectArray(Class<T> type) throws IOException;
 
-    <T extends IUnNamedSerializable> T readUnNamedObject(Class<T> type) throws IOException;
-    <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(Class<T> type) throws IOException;
+    <T extends IKeylessSerializable> T readUnNamedObject(Class<T> type) throws IOException;
+    <T extends IKeylessSerializable> T[] readUnNamedObjectArray(Class<T> type) throws IOException;
 
     <T> T readCustomObject(Class<T> type) throws IOException;
     <T> T[] readCustomObjectArray(Class<T> type) throws IOException;

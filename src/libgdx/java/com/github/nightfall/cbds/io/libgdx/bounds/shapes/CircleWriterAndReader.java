@@ -5,8 +5,8 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -29,7 +29,7 @@ public class CircleWriterAndReader implements INamedCustomSerializable<Circle>, 
     }
 
     @Override
-    public Circle read(IUnNamedDeserializer in) throws IOException{
+    public Circle read(IKeylessDeserializer in) throws IOException{
         return new Circle(
                 in.readFloat(),
                 in.readFloat(),
@@ -38,7 +38,7 @@ public class CircleWriterAndReader implements INamedCustomSerializable<Circle>, 
     }
 
     @Override
-    public void write(IUnNamedSerializer out, Circle obj) throws IOException {
+    public void write(IKeylessSerializer out, Circle obj) throws IOException {
         out.writeFloat(obj.radius);
         out.writeFloat(obj.x);
         out.writeFloat(obj.y);

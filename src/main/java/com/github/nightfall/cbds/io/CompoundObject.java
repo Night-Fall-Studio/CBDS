@@ -3,13 +3,14 @@ package com.github.nightfall.cbds.io;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinaryDeserializer;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinarySerializer;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
+import com.github.nightfall.cbds.util.NativeArrayUtil;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -23,7 +24,7 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
-public class CompoundObject implements INamedSerializable, INamedDeserializer, INamedSerializer, IUnNamedSerializable {
+public class CompoundObject implements INamedSerializable, INamedDeserializer, INamedSerializer, IKeylessSerializable {
 
     Map<String, Object> OBJECT_MAP = new HashMap<>();
 
@@ -42,7 +43,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     public static CompoundObject fromBytes(byte[] bytes, boolean isCompressed) throws IOException {
-        if (isCompressed) return new CompoundObject(new GZIPInputStream(new ByteArrayInputStream(bytes)).readAllBytes());
+        if (isCompressed) return new CompoundObject(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
         else return fromBytes(bytes);
     }
 
@@ -220,7 +221,8 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     public <T extends IDataStreamSerializable> T[] readRawObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
-        if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
+        if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
+        if (!type.isArray() && type.isAssignableFrom(o.getClass().getComponentType())) return (T[]) o;
 
         // If object was not already processed run this
         try {
@@ -265,7 +267,8 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     public <T extends INamedSerializable> T[] readNamedObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
-        if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
+        if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
+        if (!type.isArray() && type.isAssignableFrom(o.getClass().getComponentType())) return (T[]) o;
 
         // If object array was not already processed run this
         INamedDeserializer[] objs = (INamedDeserializer[]) o;
@@ -293,7 +296,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T extends IUnNamedSerializable> T readUnNamedObject(String name, Class<T> type) {
+    public <T extends IKeylessSerializable> T readUnNamedObject(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
@@ -301,7 +304,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         // If object was not already processed run this
         try {
             T obj = type.getDeclaredConstructor().newInstance();
-            obj.read((IUnNamedDeserializer) o);
+            obj.read((IKeylessDeserializer) o);
             return obj;
         } catch (
                 InstantiationException | IllegalAccessException
@@ -314,13 +317,14 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T extends IUnNamedSerializable> T[] readUnNamedObjectArray(String name, Class<T> type) {
+    public <T extends IKeylessSerializable> T[] readUnNamedObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
-        if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
+        if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
+        if (!type.isArray() && type.isAssignableFrom(o.getClass().getComponentType())) return (T[]) o;
 
         // If object array was not already processed run this
-        IUnNamedDeserializer[] objs = (IUnNamedDeserializer[]) o;
+        IKeylessDeserializer[] objs = (IKeylessDeserializer[]) o;
         T[] t = (T[]) Array.newInstance(type, objs.length);
 
         for (int i = 0; i < t.length; i++) {
@@ -366,7 +370,8 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
 
         Object o = OBJECT_MAP.get(name);
 
-        if (type.arrayType().isAssignableFrom(o.getClass())) return (T[]) o;
+        if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
+        if (!type.isArray() && type.isAssignableFrom(o.getClass().getComponentType())) return (T[]) o;
 
         // If object array was not already processed run this
         INamedDeserializer[] objs = (INamedDeserializer[]) o;
@@ -399,7 +404,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public void read(IUnNamedDeserializer deserializer) throws IOException {
+    public void read(IKeylessDeserializer deserializer) throws IOException {
         byte[] bytes = deserializer.readByteArrayAsPrimitive();
         read(INamedDeserializer.createDefault(bytes, false));
     }
@@ -538,12 +543,12 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T extends IUnNamedSerializable> void writeUnNamedObject(String name, T object) throws IOException {
+    public <T extends IKeylessSerializable> void writeUnNamedObject(String name, T object) throws IOException {
 
     }
 
     @Override
-    public <T extends IUnNamedSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException {
+    public <T extends IKeylessSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException {
 
     }
 
@@ -567,7 +572,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return OBJECT_MAP.keySet().toArray(new String[0]);
     }
 
-    public void write(IUnNamedSerializer serializer) throws IOException {
+    public void write(IKeylessSerializer serializer) throws IOException {
         INamedSerializer miniSerializer = INamedSerializer.createDefault();
         write(miniSerializer);
         serializer.writeByteArray(miniSerializer.toBytes());
@@ -632,8 +637,8 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
 
             if (o instanceof INamedSerializable) miniSerializer.writeNamedObject(key, (INamedSerializable) o);
             if (o instanceof INamedSerializable[]) miniSerializer.writeNamedObjectArray(key, (INamedSerializable[]) o);
-            if (o instanceof IUnNamedSerializable) miniSerializer.writeUnNamedObject(key, (IUnNamedSerializable) o);
-            if (o instanceof IUnNamedSerializable[]) miniSerializer.writeUnNamedObjectArray(key, (IUnNamedSerializable[]) o);
+            if (o instanceof IKeylessSerializable) miniSerializer.writeUnNamedObject(key, (IKeylessSerializable) o);
+            if (o instanceof IKeylessSerializable[]) miniSerializer.writeUnNamedObjectArray(key, (IKeylessSerializable[]) o);
             if (o instanceof IDataStreamSerializable) miniSerializer.writeRawObject(key, (IDataStreamSerializable) o);
             if (o instanceof IDataStreamSerializable[]) miniSerializer.writeRawObjectArray(key, (IDataStreamSerializable[]) o);
         }

@@ -3,13 +3,12 @@ package com.github.nightfall.cbds.io.libgdx.bounds;
 import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
-import com.badlogic.gdx.math.collision.Sphere;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -30,7 +29,7 @@ public class OrientedBoundingBoxWriterAndReader implements INamedCustomSerializa
     }
 
     @Override
-    public OrientedBoundingBox read(IUnNamedDeserializer in) throws IOException {
+    public OrientedBoundingBox read(IKeylessDeserializer in) throws IOException {
         return new OrientedBoundingBox(
                 in.readCustomObject(BoundingBox.class),
                 in.readCustomObject(Matrix4.class)
@@ -38,7 +37,7 @@ public class OrientedBoundingBoxWriterAndReader implements INamedCustomSerializa
     }
 
     @Override
-    public void write(IUnNamedSerializer out, OrientedBoundingBox obj) throws IOException {
+    public void write(IKeylessSerializer out, OrientedBoundingBox obj) throws IOException {
         out.writeCustomObject(obj.getBounds());
         out.writeCustomObject(obj.transform);
     }

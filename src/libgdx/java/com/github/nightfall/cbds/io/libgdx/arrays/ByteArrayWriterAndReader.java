@@ -5,8 +5,8 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -23,12 +23,12 @@ public class ByteArrayWriterAndReader implements INamedCustomSerializable<ByteAr
     }
 
     @Override
-    public ByteArray read(IUnNamedDeserializer in) throws IOException{
+    public ByteArray read(IKeylessDeserializer in) throws IOException{
         return new ByteArray(in.readByteArrayAsPrimitive());
     }
 
     @Override
-    public void write(IUnNamedSerializer out, ByteArray obj) throws IOException {
+    public void write(IKeylessSerializer out, ByteArray obj) throws IOException {
         out.writeByteArray(obj.items);
     }
 

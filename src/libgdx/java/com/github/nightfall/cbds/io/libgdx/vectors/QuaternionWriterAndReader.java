@@ -5,8 +5,8 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 
 import java.io.IOException;
 
@@ -31,7 +31,7 @@ public class QuaternionWriterAndReader implements INamedCustomSerializable<Quate
     }
 
     @Override
-    public Quaternion read(IUnNamedDeserializer in) throws IOException{
+    public Quaternion read(IKeylessDeserializer in) throws IOException{
         return new Quaternion(
                 in.readFloat(),
                 in.readFloat(),
@@ -41,7 +41,7 @@ public class QuaternionWriterAndReader implements INamedCustomSerializable<Quate
     }
 
     @Override
-    public void write(IUnNamedSerializer out, Quaternion obj) throws IOException {
+    public void write(IKeylessSerializer out, Quaternion obj) throws IOException {
         out.writeFloat(obj.x);
         out.writeFloat(obj.y);
         out.writeFloat(obj.z);

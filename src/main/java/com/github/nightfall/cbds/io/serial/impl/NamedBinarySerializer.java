@@ -4,16 +4,15 @@ import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.SerializationType;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.api.IUnNamedSerializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
-import com.github.nightfall.cbds.io.serial.obj.IUnNamedSerializable;
+import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.*;
-import java.util.zip.Deflater;
 import java.util.zip.GZIPOutputStream;
 
 public class NamedBinarySerializer implements INamedSerializer {
@@ -74,104 +73,104 @@ public class NamedBinarySerializer implements INamedSerializer {
 
     public void writeByte(String name, byte i) throws IOException {
         writeType(SerializationType.BYTE);
-        writeString(name);
+        output.writeUTF(name);
         output.writeByte(i);
     }
 
     public void writeByteArray(String name, byte[] array) throws IOException {
         writeType(SerializationType.BYTE_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (byte i : array) output.writeByte(i);
     }
 
     public void writeShort(String name, short i) throws IOException {
         writeType(SerializationType.SHORT_sBYTE, i);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(i);
     }
 
     public void writeShortArray(String name, short[] array) throws IOException {
         writeType(SerializationType.SHORT_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (short i : array) output.writeShort(i);
     }
 
     public void writeInt(String name, int i) throws IOException {
         writeType(SerializationType.INT_sBYTE, i);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(i);
     }
 
     public void writeIntArray(String name, int[] array) throws IOException {
         writeType(SerializationType.INT_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (int i : array) output.writeShort(i);
     }
 
     public void writeLong(String name, long i) throws IOException {
         writeType(SerializationType.LONG_sBYTE, i);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(i);
     }
 
     public void writeLongArray(String name, long[] array) throws IOException {
         writeType(SerializationType.LONG_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (long i : array) output.writeLong(i);
     }
 
     public void writeFloat(String name, float i) throws IOException {
         writeType(SerializationType.FLOAT);
-        writeString(name);
+        output.writeUTF(name);
         output.writeFloat(i);
     }
 
     public void writeFloatArray(String name, float[] array) throws IOException {
         writeType(SerializationType.FLOAT_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (float i : array) output.writeFloat(i);
     }
 
     public void writeDouble(String name, double i) throws IOException {
         writeType(SerializationType.DOUBLE);
-        writeString(name);
+        output.writeUTF(name);
         output.writeDouble(i);
     }
 
     public void writeDoubleArray(String name, double[] array) throws IOException {
         writeType(SerializationType.DOUBLE_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (double i : array) output.writeDouble(i);
     }
 
     public void writeBoolean(String name, boolean b) throws IOException {
         writeType(SerializationType.BOOLEAN);
-        writeString(name);
+        output.writeUTF(name);
         output.writeBoolean(b);
     }
 
     public void writeBooleanArray(String name, boolean[] array) throws IOException {
         writeType(SerializationType.BOOLEAN_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (boolean b : array) output.writeBoolean(b);
     }
 
     public void writeChar(String name, char c) throws IOException {
         writeType(SerializationType.CHAR);
-        writeString(name);
+        output.writeUTF(name);
         output.writeChar(c);
     }
 
     public void writeCharArray(String name, char[] array) throws IOException {
         writeType(SerializationType.CHAR_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (char c : array) output.writeChar(c);
     }
@@ -179,8 +178,8 @@ public class NamedBinarySerializer implements INamedSerializer {
     public void writeString(String name, String v) throws IOException {
         if (!doStringArray) {
             writeType(SerializationType.STRING_REGULAR);
-            writeString(name);
-            writeString(v);
+            output.writeUTF(name);
+            output.writeUTF(v);
             return;
         }
         int index = strings.indexOf(v);
@@ -190,13 +189,13 @@ public class NamedBinarySerializer implements INamedSerializer {
         }
 
         writeType(SerializationType.STRING_sBYTE, index);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(index);
     }
 
     public void writeStringArray(String name, String[] array) throws IOException {
         writeType(SerializationType.STRING_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         if (doStringArray) {
             int index;
@@ -208,7 +207,7 @@ public class NamedBinarySerializer implements INamedSerializer {
                 }
                 output.writeInt(index);
             }
-        } else for (String s : array) writeString(s);
+        } else for (String s : array) output.writeUTF(s);
     }
 
     public void writeCompoundObject(String name, CompoundObject object) throws IOException {
@@ -227,7 +226,7 @@ public class NamedBinarySerializer implements INamedSerializer {
         byte[] bytes = byteOut.toByteArray();
 
         writeType(SerializationType.RAW_OBJECT_sBYTE, bytes.length);
-        if (name != null) writeString(name);
+        if (name != null) output.writeUTF(name);
 
         writeDynamicInt(bytes.length);
         for (byte i : bytes) output.writeByte(i);
@@ -239,7 +238,7 @@ public class NamedBinarySerializer implements INamedSerializer {
 
     public <T extends IDataStreamSerializable> void writeRawObjectArray(String name, T[] array) throws IOException {
         writeType(SerializationType.RAW_OBJECT_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (T obj : array) {
             _writeRawObj(null, obj);
@@ -253,7 +252,7 @@ public class NamedBinarySerializer implements INamedSerializer {
         byte[] bytes = miniSerializer.toBytes();
 
         writeType(SerializationType.NAMED_OBJECT_sBYTE, bytes.length);
-        if (name != null) writeString(name);
+        if (name != null) output.writeUTF(name);
 
         writeDynamicInt(bytes.length);
         for (byte i : bytes) output.writeByte(i);
@@ -265,35 +264,35 @@ public class NamedBinarySerializer implements INamedSerializer {
 
     public <T extends INamedSerializable> void writeNamedObjectArray(String name, T[] array) throws IOException {
         writeType(SerializationType.NAMED_OBJECT_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (T obj : array) {
             _writeNamedObj(null, obj);
         }
     }
 
-    private <T extends IUnNamedSerializable> void _writeUnNamedObj(String name, T object) throws IOException {
-        IUnNamedSerializer miniSerializer = IUnNamedSerializer.createDefault();
+    private <T extends IKeylessSerializable> void _writeUnNamedObj(String name, T object) throws IOException {
+        IKeylessSerializer miniSerializer = IKeylessSerializer.createDefault();
         object.write(miniSerializer);
 
         byte[] bytes = miniSerializer.toBytes();
 
         writeType(SerializationType.UNNAMED_OBJECT_sBYTE, bytes.length);
-        if (name != null) writeString(name);
+        if (name != null) output.writeUTF(name);
 
         writeDynamicInt(bytes.length);
         for (byte i : bytes) output.writeByte(i);
     }
 
     @Override
-    public <T extends IUnNamedSerializable> void writeUnNamedObject(String name, T object) throws IOException {
+    public <T extends IKeylessSerializable> void writeUnNamedObject(String name, T object) throws IOException {
         _writeUnNamedObj(name, object);
     }
 
     @Override
-    public <T extends IUnNamedSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException {
+    public <T extends IKeylessSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException {
         writeType(SerializationType.UNNAMED_OBJECT_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (T obj : array) {
             _writeUnNamedObj(null, obj);
@@ -310,7 +309,7 @@ public class NamedBinarySerializer implements INamedSerializer {
         byte[] bytes = miniSerializer.toBytes();
 
         writeType(SerializationType.CUSTOM_OBJECT_sBYTE, bytes.length);
-        writeString(name);
+        if (name != null) output.writeUTF(name);
 
         writeDynamicInt(bytes.length);
         for (byte i : bytes) output.writeByte(i);
@@ -322,7 +321,7 @@ public class NamedBinarySerializer implements INamedSerializer {
 
     public <T> void writeCustomObjectArray(String name, T[] array) throws IOException {
         writeType(SerializationType.CUSTOM_OBJECT_ARRAY_sBYTE, array.length);
-        writeString(name);
+        output.writeUTF(name);
         writeDynamicInt(array.length);
         for (T obj : array) {
             _writeCustomObj(null, obj);
@@ -338,9 +337,9 @@ public class NamedBinarySerializer implements INamedSerializer {
             output = new DataOutputStream(byteStream);
 
             writeType(SerializationType.STRING_SCHEMA_sBYTE, strings.size());
-            writeString("STRINGS");
+            output.writeUTF("STRINGS");
             writeDynamicInt(strings.size());
-            for (String s : strings) writeString(s);
+            for (String s : strings) output.writeUTF(s);
 
             byteStream.write(bytes);
 
@@ -348,20 +347,6 @@ public class NamedBinarySerializer implements INamedSerializer {
         }
 
         return byteStream.toByteArray();
-    }
-
-    private void writeCharArray(char[] array) throws IOException {
-        output.writeInt(array.length);
-        for (char c : array) output.writeChar(c);
-    }
-
-    private void writeByteArray(byte[] array, int lim) throws IOException {
-        output.writeInt(lim);
-        for (int i = 0; i < lim; i++) output.writeByte(array[i]);
-    }
-
-    public void writeString(String s) throws IOException {
-        output.writeUTF(s);
     }
 
     public byte[] toCompressedBytes() throws IOException {

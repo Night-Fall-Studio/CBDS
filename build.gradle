@@ -17,10 +17,10 @@ repositories {
 }
 
 sourceSets {
-    cosmicreach // Premade CosmicReach Serializers
-    libgdx // Premade Libgdx Serializers
-    main   // Main
-    test   // Test
+    cosmicreach
+    libgdx
+    main
+    test
 }
 
 configurations {
@@ -64,6 +64,26 @@ dependencies {
     testImplementation "com.badlogicgames.gdx:gdx:1.13.0"
     testImplementation "com.github.FinalForEach:Cosmic-Reach-Save-Library:487a2cdc16"
 
+}
+
+java {
+    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
+compileTestJava {
+    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
+}
+
+compileLibgdxJava {
+    targetCompatibility = JavaVersion.VERSION_1_8
+    sourceCompatibility = JavaVersion.VERSION_1_8
+}
+
+compileCosmicreachJava {
+    targetCompatibility = JavaVersion.VERSION_17
+    sourceCompatibility = JavaVersion.VERSION_17
 }
 
 tasks.register("buildSourceJar", Jar) {
