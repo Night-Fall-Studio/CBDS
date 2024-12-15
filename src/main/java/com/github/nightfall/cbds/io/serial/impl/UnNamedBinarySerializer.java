@@ -2,12 +2,12 @@ package com.github.nightfall.cbds.io.serial.impl;
 
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
-import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
-import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.SerializationType;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
-import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
+import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
+import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;

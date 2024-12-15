@@ -5,8 +5,8 @@ import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.impl.UnNamedBinarySerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
-import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
+import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 
 import java.io.IOException;

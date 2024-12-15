@@ -4,10 +4,10 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
-import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
-import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 
 import java.io.IOException;
 

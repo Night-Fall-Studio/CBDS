@@ -2,6 +2,7 @@ package com.github.nightfall.cbds.cr;
 
 import com.badlogic.gdx.utils.ObjectMap;
 import finalforeach.cosmicreach.savelib.utils.IObjectMap;
+
 import java.util.function.BiConsumer;
 
 public class CRObjectMap<K, V> extends ObjectMap<K, V> implements IObjectMap<K, V> {

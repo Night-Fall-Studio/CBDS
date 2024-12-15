@@ -3,16 +3,18 @@ package com.github.nightfall.cbds.io.serial.impl;
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.SerializationType;
-import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
-import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
+import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 
 import java.io.ByteArrayOutputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Base64;
+import java.util.List;
 import java.util.zip.GZIPOutputStream;
 
 public class NamedBinarySerializer implements INamedSerializer {

@@ -1,17 +1,20 @@
 package com.github.nightfall.cbds.io.serial.impl;
 
 import com.github.nightfall.cbds.io.CompoundObject;
-import com.github.nightfall.cbds.io.serial.SerializationType;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.SerializationType;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
-import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
+import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
 import com.github.nightfall.cbds.util.NativeArrayUtil;
 import com.github.nightfall.cbds.util.ThrowableSupplier;
 
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.DataInputStream;
+import java.io.EOFException;
+import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.util.*;
