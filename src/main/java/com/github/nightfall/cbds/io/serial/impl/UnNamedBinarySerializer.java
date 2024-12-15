@@ -2,7 +2,6 @@ package com.github.nightfall.cbds.io.serial.impl;
 
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
-import com.github.nightfall.cbds.io.serial.SerializationType;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
@@ -23,10 +22,6 @@ public class UnNamedBinarySerializer implements IKeylessSerializer {
     public UnNamedBinarySerializer() {
         byteStream = new ByteArrayOutputStream();
         output = new DataOutputStream(byteStream);
-    }
-
-    private void writeType(SerializationType type) throws IOException {
-        output.writeByte(type.ordinal());
     }
 
     @Override
@@ -174,6 +169,7 @@ public class UnNamedBinarySerializer implements IKeylessSerializer {
         if (!KEYLESS_SERIALIZER_MAP.containsKey(object.getClass())) throw new RuntimeException("cannot serialize class of type \"" + object.getClass().getName() + "\" due to it not having a registered serializer.");
 
         IKeylessSerializer miniSerializer = newInstance();
+        //noinspection unchecked
         IUnNamedCustomSerializable<T> serializer = IKeylessSerializer.getSerializer((Class<T>) object.getClass());
         serializer.write(miniSerializer, object);
 

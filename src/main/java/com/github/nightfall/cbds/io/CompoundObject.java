@@ -518,11 +518,11 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         OBJECT_MAP.put(name, array);
     }
 
-    public void writeCompoundObject(String name, CompoundObject object) throws IOException {
+    public void writeCompoundObject(String name, CompoundObject object) {
         this.writeNamedObject(name, object);
     }
 
-    public void writeCompoundObjectArray(String name, CompoundObject[] array) throws IOException {
+    public void writeCompoundObjectArray(String name, CompoundObject[] array) {
         this.writeNamedObjectArray(name, array);
     }
 
@@ -543,22 +543,22 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T extends IKeylessSerializable> void writeUnNamedObject(String name, T object) throws IOException {
+    public <T extends IKeylessSerializable> void writeUnNamedObject(String name, T object) {
 
     }
 
     @Override
-    public <T extends IKeylessSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException {
+    public <T extends IKeylessSerializable> void writeUnNamedObjectArray(String name, T[] array) {
 
     }
 
     @Override
-    public <T> void writeCustomObject(String name, T object) throws IOException {
+    public <T> void writeCustomObject(String name, T object) {
         OBJECT_MAP.put(name, object);
     }
 
     @Override
-    public <T> void writeCustomObjectArray(String name, T[] array) throws IOException {
+    public <T> void writeCustomObjectArray(String name, T[] array) {
         OBJECT_MAP.put(name, array);
     }
 

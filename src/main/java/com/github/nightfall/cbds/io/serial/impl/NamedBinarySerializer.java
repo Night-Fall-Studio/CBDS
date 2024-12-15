@@ -305,6 +305,7 @@ public class NamedBinarySerializer implements INamedSerializer {
         if (!NAMED_SERIALIZER_MAP.containsKey(object.getClass())) throw new RuntimeException("cannot serialize class of type \"" + object.getClass().getName() + "\" due to it not having a registered serializer.");
 
         INamedSerializer miniSerializer = newInstance();
+        //noinspection unchecked
         INamedCustomSerializable<T> serializer = (INamedCustomSerializable<T>) INamedSerializer.getSerializer(object.getClass());
         serializer.write(miniSerializer, object);
 

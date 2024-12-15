@@ -29,6 +29,7 @@ public interface IKeylessSerializer {
     }
 
     static <T> IUnNamedCustomSerializable<T> getSerializer(Class<T> clazz) {
+        //noinspection unchecked
         return (IUnNamedCustomSerializable<T>) KEYLESS_SERIALIZER_MAP.get(clazz);
     }
 

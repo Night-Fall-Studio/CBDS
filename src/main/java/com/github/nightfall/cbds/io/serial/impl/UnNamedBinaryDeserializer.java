@@ -14,7 +14,6 @@ import java.io.DataInputStream;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.util.Map;
 import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
@@ -23,9 +22,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
     DataInputStream input;
     ByteArrayInputStream byteStream;
 
-    Map<String, Object> keyToValue;
-
-    public static UnNamedBinaryDeserializer fromBytes(byte[] bytes) throws IOException {
+    public static UnNamedBinaryDeserializer fromBytes(byte[] bytes) {
         return new UnNamedBinaryDeserializer(bytes);
     }
 
@@ -42,7 +39,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
         return fromBytes(NativeArrayUtil.toNativeArray(bytes), isCompressed);
     }
 
-    public UnNamedBinaryDeserializer(byte[] bytes) throws IOException {
+    public UnNamedBinaryDeserializer(byte[] bytes) {
         byteStream = new ByteArrayInputStream(bytes);
         input = new DataInputStream(byteStream);
     }
@@ -151,7 +148,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
     }
 
     @Override
-    public CompoundObject readCompoundObject() throws IOException {
+    public CompoundObject readCompoundObject() {
         return readNamedObject(CompoundObject.class);
     }
 
@@ -161,7 +158,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
     }
 
     @Override
-    public <T extends IDataStreamSerializable> T readRawObject(Class<T> type) throws IOException {
+    public <T extends IDataStreamSerializable> T readRawObject(Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
             obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsPrimitive())));
@@ -179,6 +176,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
     @Override
     public <T extends IDataStreamSerializable> T[] readRawObjectArray(Class<T> type) throws IOException {
         int length = readInt();
+        //noinspection unchecked
         T[] t = (T[]) Array.newInstance(type, length);
         for (int i = 0; i < t.length; i++) {
             t[i] = readRawObject(type);
@@ -187,7 +185,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
     }
 
     @Override
-    public <T extends INamedSerializable> T readNamedObject(Class<T> type) throws IOException {
+    public <T extends INamedSerializable> T readNamedObject(Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
             obj.read(INamedDeserializer.createDefault(readByteArrayAsPrimitive(), false));
@@ -205,6 +203,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
     @Override
     public <T extends INamedSerializable> T[] readNamedObjectArray(Class<T> type) throws IOException {
         int length = readInt();
+        //noinspection unchecked
         T[] t = (T[]) Array.newInstance(type, length);
         for (int i = 0; i < t.length; i++) {
             t[i] = readNamedObject(type);
@@ -213,7 +212,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
     }
 
     @Override
-    public <T extends IKeylessSerializable> T readUnNamedObject(Class<T> type) throws IOException {
+    public <T extends IKeylessSerializable> T readUnNamedObject(Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
             obj.read(newInstance(readByteArrayAsPrimitive(), false));
@@ -231,6 +230,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
     @Override
     public <T extends IKeylessSerializable> T[] readUnNamedObjectArray(Class<T> type) throws IOException {
         int length = readInt();
+        //noinspection unchecked
         T[] t = (T[]) Array.newInstance(type, length);
         for (int i = 0; i < t.length; i++) {
             t[i] = readUnNamedObject(type);
@@ -243,6 +243,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
         if (!KEYLESS_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         try {
+            //noinspection unchecked
             return (T) KEYLESS_DESERIALIZER_MAP.get(type).read(newInstance(readByteArrayAsPrimitive()));
         } catch (
                 IllegalArgumentException | SecurityException e
@@ -256,6 +257,7 @@ public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
         if (!KEYLESS_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         int length = readInt();
+        //noinspection unchecked
         T[] t = (T[]) Array.newInstance(type, length);
         for (int i = 0; i < t.length; i++) {
             t[i] = readCustomObject(type);

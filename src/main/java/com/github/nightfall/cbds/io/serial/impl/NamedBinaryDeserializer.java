@@ -475,6 +475,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     public <T extends IDataStreamSerializable> T[] readRawObjectArray(String name, Class<T> type) {
         try {
             Byte[][] objs = (Byte[][]) keyToValue.get(name);
+            //noinspection unchecked
             T[] t = (T[]) Array.newInstance(type, objs.length);
             for (int i = 0; i < t.length; i++) {
                 T obj = type.getDeclaredConstructor().newInstance();
@@ -509,6 +510,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
 
     public <T extends INamedSerializable> T[] readNamedObjectArray(String name, Class<T> type) {
         INamedDeserializer[] objs = (INamedDeserializer[]) keyToValue.get(name);
+        //noinspection unchecked
         T[] t = (T[]) Array.newInstance(type, objs.length);
 
         for (int i = 0; i < t.length; i++) {
@@ -548,12 +550,12 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     @Override
     public <T extends IKeylessSerializable> T[] readUnNamedObjectArray(String name, Class<T> type) {
         IKeylessDeserializer[] objs = (IKeylessDeserializer[]) keyToValue.get(name);
+        //noinspection unchecked
         T[] t = (T[]) Array.newInstance(type, objs.length);
 
         for (int i = 0; i < t.length; i++) {
-            T obj = null;
             try {
-                obj = type.getDeclaredConstructor().newInstance();
+                T obj = type.getDeclaredConstructor().newInstance();
                 obj.read(objs[i]);
                 t[i] = obj;
             } catch (
@@ -572,6 +574,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
         if (!NAMED_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 
         try {
+            //noinspection unchecked
             return (T) NAMED_DESERIALIZER_MAP.get(type).read((INamedDeserializer) keyToValue.get(name));
         } catch (
                 IllegalArgumentException | SecurityException e
@@ -580,6 +583,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
         }
     }
 
+    @SuppressWarnings("unchecked")
     public <T> T[] readCustomObjectArray(String name, Class<T> type) {
         if (!NAMED_DESERIALIZER_MAP.containsKey(type)) throw new RuntimeException("cannot deserialize class of type \"" + type.getName() + "\" due to it not having a registered deserializer.");
 

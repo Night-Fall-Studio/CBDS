@@ -25,6 +25,7 @@ public interface IKeylessDeserializer {
     }
 
     static <T> IUnNamedCustomSerializable<T> getDeserializer(Class<T> clazz) {
+        //noinspection unchecked
         return (IUnNamedCustomSerializable<T>) KEYLESS_DESERIALIZER_MAP.get(clazz);
     }
 

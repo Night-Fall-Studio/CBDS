@@ -14,13 +14,10 @@ import finalforeach.cosmicreach.savelib.crbin.CRBinSerializer;
 import finalforeach.cosmicreach.savelib.utils.*;
 
 import java.io.IOException;
-import java.util.Random;
-
 public class Main {
 
     static long startTime;
     static long endTime;
-    static final Random random = new Random();
 
     public static void main(String[] args) throws IOException {
         CBDSConstants.init();

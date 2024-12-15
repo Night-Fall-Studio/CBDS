@@ -23,6 +23,7 @@ public interface INamedSerializer {
     }
 
     static <T> INamedCustomSerializable<T> getSerializer(Class<T> clazz) {
+        //noinspection unchecked
         return (INamedCustomSerializable<T>) NAMED_SERIALIZER_MAP.get(clazz);
     }
 

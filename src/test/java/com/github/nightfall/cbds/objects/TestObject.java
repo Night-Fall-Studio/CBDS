@@ -25,7 +25,7 @@ public class TestObject implements INamedSerializable, IKeylessSerializable, ICR
     public TestObject() {}
 
     @Override
-    public void read(INamedDeserializer deserializer) throws IOException {
+    public void read(INamedDeserializer deserializer) {
     }
 
     @Override
@@ -52,7 +52,7 @@ public class TestObject implements INamedSerializable, IKeylessSerializable, ICR
     }
 
     @Override
-    public void read(IKeylessDeserializer in) throws IOException {
+    public void read(IKeylessDeserializer in) {
 
     }
 

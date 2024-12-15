@@ -25,6 +25,7 @@ public interface INamedDeserializer {
     }
 
     static <T> INamedCustomSerializable<T> getDeserializer(Class<T> clazz) {
+        //noinspection unchecked
         return (INamedCustomSerializable<T>) NAMED_DESERIALIZER_MAP.get(clazz);
     }
 
