@@ -2,7 +2,7 @@ package com.github.nightfall.cbds.io.libgdx.bounds.shapes;
 
 import com.badlogic.gdx.math.Circle;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
@@ -10,7 +10,7 @@ import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 
 import java.io.IOException;
 
-public class CircleWriterAndReader implements INamedCustomSerializable<Circle>, IUnNamedCustomSerializable<Circle> {
+public class CircleWriterAndReader implements INamedCustomSerializable<Circle>, IKeylessCustomSerializable<Circle> {
 
     @Override
     public void write(INamedSerializer serializer, Circle obj) throws IOException {

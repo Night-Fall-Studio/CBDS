@@ -2,7 +2,7 @@ package com.github.nightfall.cbds.io.libgdx.arrays;
 
 import com.badlogic.gdx.utils.FloatArray;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
@@ -10,7 +10,7 @@ import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 
 import java.io.IOException;
 
-public class FloatArrayWriterAndReader implements INamedCustomSerializable<FloatArray>, IUnNamedCustomSerializable<FloatArray> {
+public class FloatArrayWriterAndReader implements INamedCustomSerializable<FloatArray>, IKeylessCustomSerializable<FloatArray> {
 
     @Override
     public void write(INamedSerializer serializer, FloatArray obj) throws IOException {

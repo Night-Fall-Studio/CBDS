@@ -2,6 +2,7 @@ package com.github.nightfall.cbds.io.serial.api;
 
 import com.github.nightfall.cbds.CBDSConstants;
 import com.github.nightfall.cbds.io.CompoundObject;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.impl.NamedBinarySerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
@@ -12,29 +13,60 @@ import com.github.nightfall.cbds.util.NativeArrayUtil;
 import java.io.IOException;
 import java.util.HashMap;
 
+/**
+ * The API class for creating serializers with named binary objects.
+ *
+ * @author Mr Zombii
+ * @since 1.0.0
+ */
 public interface INamedSerializer {
 
     HashMap<Class<?>, INamedCustomSerializable<?>> NAMED_SERIALIZER_MAP = new HashMap<>();
 
+    /**
+     * A method for registering serializers for non-user owned objects.
+     *
+     * @see INamedCustomSerializable
+     *
+     * @param serializer The serializer being registered.
+     */
     static void registerSerializer(INamedCustomSerializable<?> serializer) {
         if (INamedSerializer.hasSerializer(serializer.getSerializableType()) && !CBDSConstants.allowSerializerOverwriting) CBDSConstants.LOGGER.warn("Cannot overwrite pre-existing serializers, try turning \"com.github.nightfall.cbds.CBDSConstants.allowSerializerOverwriting\" true.");
         if (serializer.getSerializableType().isArray()) throw new RuntimeException("cannot register serializer of array type, I recommend registering the component type instead.");
         NAMED_SERIALIZER_MAP.put(serializer.getSerializableType(), serializer);
     }
 
+    /**
+     * The method for checking if a custom serializer exist for a custom object.
+     *
+     * @param clazz the class that may have a custom serializer built for it.
+     */
     static <T> INamedCustomSerializable<T> getSerializer(Class<T> clazz) {
         //noinspection unchecked
         return (INamedCustomSerializable<T>) NAMED_SERIALIZER_MAP.get(clazz);
     }
 
+    /**
+     * The method for checking if a custom serializer exist for a custom object.
+     *
+     * @param clazz the class that may have a custom serializer built for it.
+     */
     static boolean hasSerializer(Class<?> clazz) {
         return !NAMED_SERIALIZER_MAP.containsKey(clazz);
     }
 
+    /**
+     * The method for checking if a custom serializer exist for a custom object.
+     *
+     * @param obj the object that may have a custom serializer built for it.
+     */
     static boolean hasSerializer(Object obj) {
         return hasSerializer(obj.getClass());
     }
 
+    /**
+     * A method for instancing the default named serializer implementation.
+     */
     static INamedSerializer createDefault() {
         return new NamedBinarySerializer();
     }

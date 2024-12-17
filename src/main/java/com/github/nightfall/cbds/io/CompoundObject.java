@@ -24,31 +24,60 @@ import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
+/**
+ * A basic object class used for the mass nested reading and writing objects.
+ *
+ * @author Mr Zombii
+ * @since 1.0.0
+ */
+@SuppressWarnings("unchecked")
 public class CompoundObject implements INamedSerializable, INamedDeserializer, INamedSerializer, IKeylessSerializable {
 
     Map<String, Object> OBJECT_MAP = new HashMap<>();
 
     public CompoundObject() {}
 
-    public CompoundObject(byte[] bytes) throws IOException {
+    private CompoundObject(byte[] bytes) throws IOException {
         read(new NamedBinaryDeserializer(bytes));
     }
 
+    /**
+     * A helper method for creating a compound object.
+     *
+     * @param bytes the bytes to deserialize.
+     */
     public static CompoundObject fromBytes(byte[] bytes) throws IOException {
-        return new CompoundObject(bytes);
+        return fromBytes(bytes, false);
     }
 
+    /**
+     * A helper method for creating a compound object.
+     *
+     * @param bytes the bytes to deserialize.
+     */
     public static CompoundObject fromBytes(Byte[] bytes) throws IOException {
-        return fromBytes(readByteArrayAsPrimitive(bytes));
+        return fromBytes(bytes, false);
     }
 
+    /**
+     * A helper method for creating a compound object.
+     *
+     * @param bytes the bytes to deserialize.
+     * @param isCompressed the option to choose weather if the bytes are treated as compressed or decompressed bytes.
+     */
     public static CompoundObject fromBytes(byte[] bytes, boolean isCompressed) throws IOException {
         if (isCompressed) return new CompoundObject(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
-        else return fromBytes(bytes);
+        else return new CompoundObject(bytes);
     }
 
+    /**
+     * A helper method for creating a compound object.
+     *
+     * @param bytes the bytes to deserialize.
+     * @param isCompressed the option to choose weather if the bytes are treated as compressed or decompressed bytes.
+     */
     public static CompoundObject fromBytes(Byte[] bytes, boolean isCompressed) throws IOException {
-        return fromBytes(readByteArrayAsPrimitive(bytes), isCompressed);
+        return fromBytes(NativeArrayUtil.toNativeArray(bytes), isCompressed);
     }
 
     @Override
@@ -56,14 +85,17 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return fromBytes(bytes, isCompressed);
     }
 
+    @Override
     public byte readByte(String name) {
         return (byte) OBJECT_MAP.get(name);
     }
 
+    @Override
     public Byte[] readByteArray(String name) {
         return (Byte[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public byte[] readByteArrayAsPrimitive(String name) {
         Byte[] array = (Byte[]) OBJECT_MAP.get(name);
         byte[] pArray = new byte[array.length];
@@ -71,14 +103,17 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
+    @Override
     public short readShort(String name) {
         return (short) OBJECT_MAP.get(name);
     }
 
+    @Override
     public Short[] readShortArray(String name) {
         return (Short[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public short[] readShortArrayAsPrimitive(String name) {
         Short[] array = (Short[]) OBJECT_MAP.get(name);
         short[] pArray = new short[array.length];
@@ -86,14 +121,17 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
+    @Override
     public int readInt(String name) {
         return (int) OBJECT_MAP.get(name);
     }
 
+    @Override
     public Integer[] readIntArray(String name) {
         return (Integer[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public int[] readIntArrayAsPrimitive(String name) {
         Integer[] array = (Integer[]) OBJECT_MAP.get(name);
         int[] pArray = new int[array.length];
@@ -101,14 +139,17 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
+    @Override
     public long readLong(String name) {
         return (long) OBJECT_MAP.get(name);
     }
 
+    @Override
     public Long[] readLongArray(String name) {
         return (Long[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public long[] readLongArrayAsPrimitive(String name) {
         Long[] array = (Long[]) OBJECT_MAP.get(name);
         long[] pArray = new long[array.length];
@@ -116,14 +157,17 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
+    @Override
     public float readFloat(String name) {
         return (float) OBJECT_MAP.get(name);
     }
 
+    @Override
     public Float[] readFloatArray(String name) {
         return (Float[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public float[] readFloatArrayAsPrimitive(String name) {
         Float[] array = (Float[]) OBJECT_MAP.get(name);
         float[] pArray = new float[array.length];
@@ -131,14 +175,17 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
+    @Override
     public double readDouble(String name) {
         return (double) OBJECT_MAP.get(name);
     }
 
+    @Override
     public Double[] readDoubleArray(String name) {
         return (Double[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public double[] readDoubleArrayAsPrimitive(String name) {
         Double[] array = (Double[]) OBJECT_MAP.get(name);
         double[] pArray = new double[array.length];
@@ -146,14 +193,17 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
+    @Override
     public boolean readBoolean(String name) {
         return (boolean) OBJECT_MAP.get(name);
     }
 
+    @Override
     public Boolean[] readBooleanArray(String name) {
         return (Boolean[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public boolean[] readBooleanArrayAsPrimitive(String name) {
         Boolean[] array = (Boolean[]) OBJECT_MAP.get(name);
         boolean[] pArray = new boolean[array.length];
@@ -161,14 +211,17 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
+    @Override
     public char readChar(String name) {
         return (char) OBJECT_MAP.get(name);
     }
 
+    @Override
     public Character[] readCharArray(String name) {
         return (Character[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public char[] readCharArrayAsPrimitive(String name) {
         Character[] array = (Character[]) OBJECT_MAP.get(name);
         char[] pArray = new char[array.length];
@@ -176,37 +229,35 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return pArray;
     }
 
+    @Override
     public String readString(String name) {
         return (String) OBJECT_MAP.get(name);
     }
 
+    @Override
     public String[] readStringArray(String name) {
         return (String[]) OBJECT_MAP.get(name);
     }
 
+    @Override
     public CompoundObject readCompoundObject(String name) {
         return readNamedObject(name, CompoundObject.class);
     }
 
+    @Override
     public CompoundObject[] readCompoundObjectArray(String name) {
         return readNamedObjectArray(name, CompoundObject.class);
     }
 
-    private static byte[] readByteArrayAsPrimitive(Byte[] array) {
-        byte[] pArray = new byte[array.length];
-        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
-        return pArray;
-    }
-
+    @Override
     public <T extends IDataStreamSerializable> T readRawObject(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
 
-        // If object was not already processed run this
         try {
             T obj = type.getDeclaredConstructor().newInstance();
-            obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsPrimitive((Byte[]) o))));
+            obj.read(new DataInputStream(new ByteArrayInputStream(NativeArrayUtil.toNativeArray((Byte[]) o))));
             return obj;
         } catch (
                 InstantiationException | IllegalAccessException
@@ -218,19 +269,19 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         }
     }
 
+    @Override
     public <T extends IDataStreamSerializable> T[] readRawObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
         if (!type.isArray() && type.isAssignableFrom(o.getClass().getComponentType())) return (T[]) o;
 
-        // If object was not already processed run this
         try {
             Byte[][] objs = (Byte[][]) OBJECT_MAP.get(name);
             T[] t = (T[]) Array.newInstance(type, objs.length);
             for (int i = 0; i < t.length; i++) {
                 T obj = type.getDeclaredConstructor().newInstance();
-                obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsPrimitive(objs[i]))));
+                obj.read(new DataInputStream(new ByteArrayInputStream(NativeArrayUtil.toNativeArray(objs[i]))));
                 t[i] = obj;
             }
             return t;
@@ -244,12 +295,12 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         }
     }
 
+    @Override
     public <T extends INamedSerializable> T readNamedObject(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
 
-        // If object was not already processed run this
         try {
             T obj = type.getDeclaredConstructor().newInstance();
             obj.read((INamedDeserializer) o);
@@ -264,21 +315,20 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         }
     }
 
+    @Override
     public <T extends INamedSerializable> T[] readNamedObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
         if (!type.isArray() && type.isAssignableFrom(o.getClass().getComponentType())) return (T[]) o;
 
-        // If object array was not already processed run this
         INamedDeserializer[] objs = (INamedDeserializer[]) o;
 
         T[] t = (T[]) Array.newInstance(type, objs.length);
 
         for (int i = 0; i < t.length; i++) {
-            T obj = null;
             try {
-                obj = type.getDeclaredConstructor().newInstance();
+                T obj = type.getDeclaredConstructor().newInstance();
                 obj.read(objs[i]);
                 t[i] = obj;
             } catch (
@@ -301,7 +351,6 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
 
-        // If object was not already processed run this
         try {
             T obj = type.getDeclaredConstructor().newInstance();
             obj.read((IKeylessDeserializer) o);
@@ -323,8 +372,8 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
         if (!type.isArray() && type.isAssignableFrom(o.getClass().getComponentType())) return (T[]) o;
 
-        // If object array was not already processed run this
         IKeylessDeserializer[] objs = (IKeylessDeserializer[]) o;
+
         T[] t = (T[]) Array.newInstance(type, objs.length);
 
         for (int i = 0; i < t.length; i++) {
@@ -353,7 +402,9 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
 
         Object o = getObject(name);
 
-        if (type.isAssignableFrom(o.getClass())) return (T) o;
+
+        if (type.isAssignableFrom(o.getClass()))
+            return (T) o;
 
         try {
             return INamedDeserializer.getDeserializer(type).read((INamedDeserializer) o);
@@ -373,7 +424,6 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
         if (!type.isArray() && type.isAssignableFrom(o.getClass().getComponentType())) return (T[]) o;
 
-        // If object array was not already processed run this
         INamedDeserializer[] objs = (INamedDeserializer[]) o;
         INamedCustomSerializable<T> customDeserializer = INamedDeserializer.getDeserializer(type);
 
@@ -526,18 +576,22 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         this.writeNamedObjectArray(name, array);
     }
 
+    @Override
     public <T extends IDataStreamSerializable> void writeRawObject(String name, T object) {
         OBJECT_MAP.put(name, object);
     }
 
+    @Override
     public <T extends IDataStreamSerializable> void writeRawObjectArray(String name, T[] array) {
         OBJECT_MAP.put(name, array);
     }
 
+    @Override
     public <T extends INamedSerializable> void writeNamedObject(String name, T object) {
         OBJECT_MAP.put(name, object);
     }
 
+    @Override
     public <T extends INamedSerializable> void writeNamedObjectArray(String name, T[] array) {
         OBJECT_MAP.put(name, array);
     }
@@ -572,6 +626,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return OBJECT_MAP.keySet().toArray(new String[0]);
     }
 
+    @Override
     public void write(IKeylessSerializer serializer) throws IOException {
         INamedSerializer miniSerializer = INamedSerializer.createDefault();
         write(miniSerializer);
@@ -646,12 +701,14 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         serializer.writeByteArray("data", miniSerializer.toBytes());
     }
 
+    @Override
     public byte[] toBytes() throws IOException {
         NamedBinarySerializer serializer = new NamedBinarySerializer();
         serializer.writeCompoundObject("cbds_compound_object", this);
         return serializer.toBytes();
     }
 
+    @Override
     public byte[] toCompressedBytes() throws IOException {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         GZIPOutputStream stream1 = new GZIPOutputStream(stream);
@@ -660,37 +717,14 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
         return stream.toByteArray();
     }
 
+    @Override
     public String toBase64() throws IOException {
         return Base64.getEncoder().encodeToString(toBytes());
     }
 
+    @Override
     public String toCompressedBase64() throws IOException {
         return Base64.getEncoder().encodeToString(toCompressedBytes());
-    }
-
-    public byte[] toBytes(INamedSerializer serializer) throws IOException {
-        serializer.writeCompoundObject("cbds_compound_object", this);
-        return serializer.toBytes();
-    }
-
-    public byte[] toCompressedBytes(INamedSerializer serializer) throws IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        GZIPOutputStream stream1 = new GZIPOutputStream(stream);
-        stream1.write(toBytes(serializer));
-        stream1.close();
-        return stream.toByteArray();
-    }
-
-    public byte[] toBase64(INamedSerializer serializer) throws IOException {
-        return Base64.getEncoder().encode(toBytes(serializer));
-    }
-
-    public byte[] toCompressedBase64(INamedSerializer serializer) throws IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        GZIPOutputStream stream1 = new GZIPOutputStream(stream);
-        stream1.write(Base64.getEncoder().encode(toCompressedBytes(serializer)));
-        stream1.close();
-        return stream.toByteArray();
     }
 
 }

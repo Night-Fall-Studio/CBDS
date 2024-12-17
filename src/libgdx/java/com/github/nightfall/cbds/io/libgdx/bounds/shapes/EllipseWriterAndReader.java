@@ -2,7 +2,7 @@ package com.github.nightfall.cbds.io.libgdx.bounds.shapes;
 
 import com.badlogic.gdx.math.Ellipse;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
@@ -10,7 +10,7 @@ import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 
 import java.io.IOException;
 
-public class EllipseWriterAndReader implements INamedCustomSerializable<Ellipse>, IUnNamedCustomSerializable<Ellipse> {
+public class EllipseWriterAndReader implements INamedCustomSerializable<Ellipse>, IKeylessCustomSerializable<Ellipse> {
 
     @Override
     public void write(INamedSerializer serializer, Ellipse obj) throws IOException {

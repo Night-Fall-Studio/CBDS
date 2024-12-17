@@ -2,7 +2,7 @@ package com.github.nightfall.cbds.io.libgdx.vectors;
 
 import com.badlogic.gdx.math.Vector4;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
@@ -10,7 +10,7 @@ import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 
 import java.io.IOException;
 
-public class Vector4WriterAndReader implements INamedCustomSerializable<Vector4>, IUnNamedCustomSerializable<Vector4> {
+public class Vector4WriterAndReader implements INamedCustomSerializable<Vector4>, IKeylessCustomSerializable<Vector4> {
 
     @Override
     public void write(INamedSerializer serializer, Vector4 obj) throws IOException {

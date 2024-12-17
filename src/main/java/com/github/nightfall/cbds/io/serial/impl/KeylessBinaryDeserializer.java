@@ -2,6 +2,7 @@ package com.github.nightfall.cbds.io.serial.impl;
 
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
+import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
@@ -17,29 +18,59 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.function.Function;
 import java.util.zip.GZIPInputStream;
 
-public class UnNamedBinaryDeserializer implements IKeylessDeserializer {
+/**
+ * The default & fast implementation of the IKeylessDeserializer.
+ *
+ * @see IKeylessDeserializer
+ *
+ * @author Mr Zombii
+ * @since 1.0.0
+ */
+public class KeylessBinaryDeserializer implements IKeylessDeserializer {
 
     DataInputStream input;
     ByteArrayInputStream byteStream;
 
-    public static UnNamedBinaryDeserializer fromBytes(byte[] bytes) {
-        return new UnNamedBinaryDeserializer(bytes);
+    /**
+     * A helper method for creating a keyless deserializer.
+     *
+     * @param bytes the bytes to deserialize.
+     */
+    public static KeylessBinaryDeserializer fromBytes(byte[] bytes) {
+        return new KeylessBinaryDeserializer(bytes);
     }
 
-    public static UnNamedBinaryDeserializer fromBytes(Byte[] bytes) throws IOException {
+    /**
+     * A helper method for creating a keyless binary deserializer.
+     *
+     * @param bytes the bytes to deserialize.
+     */
+    public static KeylessBinaryDeserializer fromBytes(Byte[] bytes) throws IOException {
         return fromBytes(NativeArrayUtil.toNativeArray(bytes));
     }
 
-    public static UnNamedBinaryDeserializer fromBytes(byte[] bytes, boolean isCompressed) throws IOException {
-        if (isCompressed) return new UnNamedBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
+    /**
+     * A helper method for creating a keyless binary deserializer.
+     *
+     * @param bytes the bytes to deserialize.
+     * @param isCompressed the option to choose weather if the bytes are treated as compressed or decompressed bytes.
+     */
+    public static KeylessBinaryDeserializer fromBytes(byte[] bytes, boolean isCompressed) throws IOException {
+        if (isCompressed) return new KeylessBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
         else return fromBytes(bytes);
     }
 
-    public static UnNamedBinaryDeserializer fromBytes(Byte[] bytes, boolean isCompressed) throws IOException {
+    /**
+     * A helper method for creating a keyless binary deserializer.
+     *
+     * @param bytes the bytes to deserialize.
+     * @param isCompressed the option to choose weather if the bytes are treated as compressed or decompressed bytes.
+     */
+    public static KeylessBinaryDeserializer fromBytes(Byte[] bytes, boolean isCompressed) throws IOException {
         return fromBytes(NativeArrayUtil.toNativeArray(bytes), isCompressed);
     }
 
-    public UnNamedBinaryDeserializer(byte[] bytes) {
+    public KeylessBinaryDeserializer(byte[] bytes) {
         byteStream = new ByteArrayInputStream(bytes);
         input = new DataInputStream(byteStream);
     }

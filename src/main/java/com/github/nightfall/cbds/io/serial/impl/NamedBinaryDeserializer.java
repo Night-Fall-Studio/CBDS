@@ -5,6 +5,7 @@ import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
 import com.github.nightfall.cbds.io.serial.SerializationType;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
+import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
@@ -24,6 +25,14 @@ import java.util.zip.GZIPInputStream;
 
 import static com.github.nightfall.cbds.io.serial.SerializationType.*;
 
+/**
+ * The default & fast implementation of the INamedDeserializer.
+ *
+ * @see INamedDeserializer
+ *
+ * @author Mr Zombii
+ * @since 1.0.0
+ */
 public class NamedBinaryDeserializer implements INamedDeserializer {
 
     DataInputStream input;
@@ -31,14 +40,30 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
 
     Map<String, Object> keyToValue;
 
+    /**
+     * A helper method for creating a named binary deserializer.
+     *
+     * @param bytes the bytes to deserialize.
+     */
     public static NamedBinaryDeserializer fromBytes(byte[] bytes) throws IOException {
         return new NamedBinaryDeserializer(bytes);
     }
 
+    /**
+     * A helper method for creating a named binary deserializer.
+     *
+     * @param bytes the bytes to deserialize.
+     */
     public static NamedBinaryDeserializer fromBytes(Byte[] bytes) throws IOException {
         return fromBytes(NativeArrayUtil.toNativeArray(bytes));
     }
 
+    /**
+     * A helper method for creating a named binary deserializer.
+     *
+     * @param bytes the bytes to deserialize.
+     * @param isCompressed the option to choose weather if the bytes are treated as compressed or decompressed bytes.
+     */
     public static NamedBinaryDeserializer fromBytes(byte[] bytes, boolean isCompressed) throws IOException {
         if (isCompressed) {
             return new NamedBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
@@ -46,6 +71,12 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
         else return fromBytes(bytes);
     }
 
+    /**
+     * A helper method for creating a named binary deserializer.
+     *
+     * @param bytes the bytes to deserialize.
+     * @param isCompressed the option to choose weather if the bytes are treated as compressed or decompressed bytes.
+     */
     public static NamedBinaryDeserializer fromBytes(Byte[] bytes, boolean isCompressed) throws IOException {
         return fromBytes(NativeArrayUtil.toNativeArray(bytes), isCompressed);
     }

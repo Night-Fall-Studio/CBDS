@@ -3,7 +3,7 @@ package com.github.nightfall.cbds.io.libgdx.bounds;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
@@ -11,7 +11,7 @@ import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 
 import java.io.IOException;
 
-public class BoundingBoxWriterAndReader implements INamedCustomSerializable<BoundingBox>, IUnNamedCustomSerializable<BoundingBox> {
+public class BoundingBoxWriterAndReader implements INamedCustomSerializable<BoundingBox>, IKeylessCustomSerializable<BoundingBox> {
 
     @Override
     public void write(INamedSerializer serializer, BoundingBox obj) throws IOException {

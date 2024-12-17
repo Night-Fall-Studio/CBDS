@@ -2,8 +2,8 @@ package com.github.nightfall.cbds.io.serial.api;
 
 import com.github.nightfall.cbds.CBDSConstants;
 import com.github.nightfall.cbds.io.CompoundObject;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
-import com.github.nightfall.cbds.io.serial.impl.UnNamedBinaryDeserializer;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
+import com.github.nightfall.cbds.io.serial.impl.KeylessBinaryDeserializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
@@ -16,17 +16,17 @@ import java.util.zip.GZIPInputStream;
 
 public interface IKeylessDeserializer {
 
-    HashMap<Class<?>, IUnNamedCustomSerializable<?>> KEYLESS_DESERIALIZER_MAP = new HashMap<>();
+    HashMap<Class<?>, IKeylessCustomSerializable<?>> KEYLESS_DESERIALIZER_MAP = new HashMap<>();
 
-    static void registerDeserializer(IUnNamedCustomSerializable<?> deserializer) {
+    static void registerDeserializer(IKeylessCustomSerializable<?> deserializer) {
         if (hasDeserializer(deserializer.getSerializableType()) && !CBDSConstants.allowDeserializerOverwriting) CBDSConstants.LOGGER.warn("Cannot overwrite pre-existing serializers, try turning \"com.github.nightfall.cbds.CBDSConstants.allowDeserializerOverwriting\" true.");
         if (deserializer.getSerializableType().isArray()) throw new RuntimeException("cannot register deserializer of array type, I recommend registering the component type instead.");
         KEYLESS_DESERIALIZER_MAP.put(deserializer.getSerializableType(), deserializer);
     }
 
-    static <T> IUnNamedCustomSerializable<T> getDeserializer(Class<T> clazz) {
+    static <T> IKeylessCustomSerializable<T> getDeserializer(Class<T> clazz) {
         //noinspection unchecked
-        return (IUnNamedCustomSerializable<T>) KEYLESS_DESERIALIZER_MAP.get(clazz);
+        return (IKeylessCustomSerializable<T>) KEYLESS_DESERIALIZER_MAP.get(clazz);
     }
 
     static boolean hasDeserializer(Class<?> clazz) {
@@ -39,8 +39,8 @@ public interface IKeylessDeserializer {
 
     static IKeylessDeserializer createDefault(byte[] bytes, boolean isCompressed) throws IOException {
         if (isCompressed)
-            return new UnNamedBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
-        return new UnNamedBinaryDeserializer(bytes);
+            return new KeylessBinaryDeserializer(NativeArrayUtil.readNBytes(new GZIPInputStream(new ByteArrayInputStream(bytes)), Integer.MAX_VALUE));
+        return new KeylessBinaryDeserializer(bytes);
     }
 
     static IKeylessDeserializer createDefault(Byte[] bytes, boolean isCompressed) throws IOException {

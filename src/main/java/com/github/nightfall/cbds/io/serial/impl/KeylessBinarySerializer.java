@@ -1,8 +1,9 @@
 package com.github.nightfall.cbds.io.serial.impl;
 
 import com.github.nightfall.cbds.io.CompoundObject;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
+import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
@@ -14,19 +15,27 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.zip.GZIPOutputStream;
 
-public class UnNamedBinarySerializer implements IKeylessSerializer {
+/**
+ * The default & fast implementation of the IKeylessSerializer.
+ *
+ * @see IKeylessSerializer
+ *
+ * @author Mr Zombii
+ * @since 1.0.0
+ */
+public class KeylessBinarySerializer implements IKeylessSerializer {
 
     final DataOutputStream output;
     final ByteArrayOutputStream byteStream;
 
-    public UnNamedBinarySerializer() {
+    public KeylessBinarySerializer() {
         byteStream = new ByteArrayOutputStream();
         output = new DataOutputStream(byteStream);
     }
 
     @Override
     public IKeylessSerializer newInstance() {
-        return new UnNamedBinarySerializer();
+        return new KeylessBinarySerializer();
     }
 
     public void writeByte(byte i) throws IOException {
@@ -170,7 +179,7 @@ public class UnNamedBinarySerializer implements IKeylessSerializer {
 
         IKeylessSerializer miniSerializer = newInstance();
         //noinspection unchecked
-        IUnNamedCustomSerializable<T> serializer = IKeylessSerializer.getSerializer((Class<T>) object.getClass());
+        IKeylessCustomSerializable<T> serializer = IKeylessSerializer.getSerializer((Class<T>) object.getClass());
         serializer.write(miniSerializer, object);
 
         writeByteArray(miniSerializer.toBytes());

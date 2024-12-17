@@ -4,7 +4,7 @@ import com.badlogic.gdx.math.Matrix4;
 import com.badlogic.gdx.math.collision.BoundingBox;
 import com.badlogic.gdx.math.collision.OrientedBoundingBox;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
@@ -12,7 +12,7 @@ import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 
 import java.io.IOException;
 
-public class OrientedBoundingBoxWriterAndReader implements INamedCustomSerializable<OrientedBoundingBox>, IUnNamedCustomSerializable<OrientedBoundingBox> {
+public class OrientedBoundingBoxWriterAndReader implements INamedCustomSerializable<OrientedBoundingBox>, IKeylessCustomSerializable<OrientedBoundingBox> {
 
     @Override
     public void write(INamedSerializer serializer, OrientedBoundingBox obj) throws IOException {

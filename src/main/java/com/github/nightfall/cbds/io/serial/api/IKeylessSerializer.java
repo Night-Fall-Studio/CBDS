@@ -2,8 +2,8 @@ package com.github.nightfall.cbds.io.serial.api;
 
 import com.github.nightfall.cbds.CBDSConstants;
 import com.github.nightfall.cbds.io.CompoundObject;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
-import com.github.nightfall.cbds.io.serial.impl.UnNamedBinarySerializer;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
+import com.github.nightfall.cbds.io.serial.impl.KeylessBinarySerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
 import com.github.nightfall.cbds.io.serial.obj.INamedSerializable;
@@ -13,36 +13,63 @@ import java.io.IOException;
 import java.util.HashMap;
 
 /**
- * The API class for the Keyless Serializers.
+ * The API class for creating serializers with only binary objects, similar to the DataOutputStream.
+ *
+ * @see java.io.DataOutputStream
  *
  * @author Mr Zombii
  * @since 1.0.0
  */
 public interface IKeylessSerializer {
 
-    HashMap<Class<?>, IUnNamedCustomSerializable<?>> KEYLESS_SERIALIZER_MAP = new HashMap<>();
+    HashMap<Class<?>, IKeylessCustomSerializable<?>> KEYLESS_SERIALIZER_MAP = new HashMap<>();
 
-    static void registerSerializer(IUnNamedCustomSerializable<?> serializer) {
+    /**
+     * A method for registering serializers for non-user owned objects.
+     *
+     * @see IKeylessCustomSerializable
+     *
+     * @param serializer The serializer being registered.
+     */
+    static void registerSerializer(IKeylessCustomSerializable<?> serializer) {
         if (INamedSerializer.hasSerializer(serializer.getSerializableType()) && !CBDSConstants.allowSerializerOverwriting) CBDSConstants.LOGGER.warn("Cannot overwrite pre-existing serializers, try turning \"com.github.nightfall.cbds.CBDSConstants.allowSerializerOverwriting\" true.");
         if (serializer.getSerializableType().isArray()) throw new RuntimeException("cannot register serializer of array type, I recommend registering the component type instead.");
         KEYLESS_SERIALIZER_MAP.put(serializer.getSerializableType(), serializer);
     }
 
-    static <T> IUnNamedCustomSerializable<T> getSerializer(Class<T> clazz) {
+    /**
+     * The method for checking if a custom serializer exist for a custom object.
+     *
+     * @param clazz the class that may have a custom serializer built for it.
+     */
+    static <T> IKeylessCustomSerializable<T> getSerializer(Class<T> clazz) {
         //noinspection unchecked
-        return (IUnNamedCustomSerializable<T>) KEYLESS_SERIALIZER_MAP.get(clazz);
+        return (IKeylessCustomSerializable<T>) KEYLESS_SERIALIZER_MAP.get(clazz);
     }
 
+    /**
+     * The method for checking if a custom serializer exist for a custom object.
+     *
+     * @param clazz the class that may have a custom serializer built for it.
+     */
     static boolean hasSerializer(Class<?> clazz) {
         return !KEYLESS_SERIALIZER_MAP.containsKey(clazz);
     }
 
+    /**
+     * The method for checking if a custom serializer exist for a custom object.
+     *
+     * @param obj the object that may have a custom serializer built for it.
+     */
     static boolean hasSerializer(Object obj) {
         return hasSerializer(obj.getClass());
     }
 
+    /**
+     * A method for instancing the default keyless serializer implementation.
+     */
     static IKeylessSerializer createDefault() {
-        return new UnNamedBinarySerializer();
+        return new KeylessBinarySerializer();
     }
 
     IKeylessSerializer newInstance();

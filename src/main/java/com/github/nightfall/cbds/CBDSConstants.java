@@ -1,7 +1,7 @@
 package com.github.nightfall.cbds;
 
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
@@ -38,12 +38,15 @@ public class CBDSConstants {
         register(INamedCustomSerializable.class, INamedSerializer::registerSerializer);
         register(INamedCustomSerializable.class, INamedDeserializer::registerDeserializer);
 
-        register(IUnNamedCustomSerializable.class, IKeylessSerializer::registerSerializer);
-        register(IUnNamedCustomSerializable.class, IKeylessDeserializer::registerDeserializer);
+        register(IKeylessCustomSerializable.class, IKeylessSerializer::registerSerializer);
+        register(IKeylessCustomSerializable.class, IKeylessDeserializer::registerDeserializer);
     }
 
     /**
      * A utility method for loading Service Classes using one class reference and one consuming method.
+     *
+     * @param clazz The class being used as a service.
+     * @param method The method to be called to consume each object found.
      */
     public static <T> void register(Class<T> clazz, Consumer<T> method) {
         // Init from other jars

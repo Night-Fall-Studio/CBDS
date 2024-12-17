@@ -2,7 +2,7 @@ package com.github.nightfall.cbds.io.libgdx.matrix;
 
 import com.badlogic.gdx.math.Matrix4;
 import com.github.nightfall.cbds.io.custom.INamedCustomSerializable;
-import com.github.nightfall.cbds.io.custom.IUnNamedCustomSerializable;
+import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
@@ -10,7 +10,7 @@ import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 
 import java.io.IOException;
 
-public class Matrix4WriterAndReader implements INamedCustomSerializable<Matrix4>, IUnNamedCustomSerializable<Matrix4> {
+public class Matrix4WriterAndReader implements INamedCustomSerializable<Matrix4>, IKeylessCustomSerializable<Matrix4> {
 
     @Override
     public void write(INamedSerializer serializer, Matrix4 obj) throws IOException {

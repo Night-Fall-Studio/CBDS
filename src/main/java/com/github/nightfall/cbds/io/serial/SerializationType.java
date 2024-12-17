@@ -1,7 +1,15 @@
 package com.github.nightfall.cbds.io.serial;
 
+/**
+ * A class keeping track of each object serialization type used by INamed serial and deserializers.
+ *
+ * @see com.github.nightfall.cbds.io.serial.api.INamedSerializer
+ * @see com.github.nightfall.cbds.io.serial.api.INamedDeserializer
+ *
+ * @author Mr Zombii
+ * @since 1.0.0
+ */
 public enum SerializationType {
-
     STRING_SCHEMA_sINT,
     STRING_SCHEMA_sSHORT,
     STRING_SCHEMA_sBYTE,
