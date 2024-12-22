@@ -19,12 +19,12 @@ public class Matrix4WriterAndReader implements INamedCustomSerializable<Matrix4>
 
     @Override
     public Matrix4 read(INamedDeserializer deserializer) {
-        return new Matrix4(deserializer.readFloatArrayAsPrimitive("val"));
+        return new Matrix4(deserializer.readFloatArrayAsNative("val"));
     }
 
     @Override
     public Matrix4 read(IKeylessDeserializer in) throws IOException{
-        return new Matrix4(in.readFloatArrayAsPrimitive());
+        return new Matrix4(in.readFloatArrayAsNative());
     }
 
     @Override

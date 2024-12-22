@@ -3,7 +3,6 @@ package com.github.nightfall.cbds.io.serial.impl;
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.custom.IKeylessCustomSerializable;
 import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
-import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.api.INamedSerializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
@@ -120,11 +119,11 @@ public class KeylessBinarySerializer implements IKeylessSerializer {
     }
 
     public void writeCompoundObject(CompoundObject object) throws IOException {
-        writeUnNamedObject(object);
+        writeKeylessObject(object);
     }
 
     public void writeCompoundObjectArray(CompoundObject[] array) throws IOException {
-        writeUnNamedObjectArray(array);
+        writeKeylessObjectArray(array);
     }
 
     public <T extends IDataStreamSerializable> void writeRawObject(T object) throws IOException {
@@ -158,7 +157,7 @@ public class KeylessBinarySerializer implements IKeylessSerializer {
         }
     }
 
-    public <T extends IKeylessSerializable> void writeUnNamedObject(T object) throws IOException {
+    public <T extends IKeylessSerializable> void writeKeylessObject(T object) throws IOException {
         IKeylessSerializer miniSerializer = newInstance();
         object.write(miniSerializer);
 
@@ -167,10 +166,10 @@ public class KeylessBinarySerializer implements IKeylessSerializer {
         writeByteArray(miniSerializer.toBytes());
     }
 
-    public <T extends IKeylessSerializable> void writeUnNamedObjectArray(T[] array) throws IOException {
+    public <T extends IKeylessSerializable> void writeKeylessObjectArray(T[] array) throws IOException {
         output.writeInt(array.length);
         for (T obj : array) {
-            writeUnNamedObject(obj);
+            writeKeylessObject(obj);
         }
     }
 

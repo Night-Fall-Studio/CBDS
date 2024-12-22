@@ -19,12 +19,12 @@ public class IntArrayWriterAndReader implements INamedCustomSerializable<IntArra
 
     @Override
     public IntArray read(INamedDeserializer deserializer) {
-        return new IntArray(deserializer.readIntArrayAsPrimitive("items"));
+        return new IntArray(deserializer.readIntArrayAsNative("items"));
     }
 
     @Override
     public IntArray read(IKeylessDeserializer in) throws IOException{
-        return new IntArray(in.readIntArrayAsPrimitive());
+        return new IntArray(in.readIntArrayAsNative());
     }
 
     @Override

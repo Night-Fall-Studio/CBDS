@@ -296,12 +296,12 @@ public class NamedBinarySerializer implements INamedSerializer {
     }
 
     @Override
-    public <T extends IKeylessSerializable> void writeUnNamedObject(String name, T object) throws IOException {
+    public <T extends IKeylessSerializable> void writeKeylessObject(String name, T object) throws IOException {
         _writeUnNamedObj(name, object);
     }
 
     @Override
-    public <T extends IKeylessSerializable> void writeUnNamedObjectArray(String name, T[] array) throws IOException {
+    public <T extends IKeylessSerializable> void writeKeylessObjectArray(String name, T[] array) throws IOException {
         writeType(SerializationType.UNNAMED_OBJECT_ARRAY_sBYTE, array.length);
         output.writeUTF(name);
         writeDynamicInt(array.length);
@@ -359,22 +359,6 @@ public class NamedBinarySerializer implements INamedSerializer {
         }
 
         return byteStream.toByteArray();
-    }
-
-    public byte[] toCompressedBytes() throws IOException {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        GZIPOutputStream stream1 = new GZIPOutputStream(stream);
-        stream1.write(byteStream.toByteArray());
-        stream1.close();
-        return stream.toByteArray();
-    }
-
-    public String toBase64() throws IOException {
-        return Base64.getEncoder().encodeToString(toBytes());
-    }
-
-    public String toCompressedBase64() throws IOException {
-        return Base64.getEncoder().encodeToString(toCompressedBytes());
     }
 
 }

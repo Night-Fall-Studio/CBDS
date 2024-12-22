@@ -2,7 +2,6 @@ package com.github.nightfall.cbds.io.serial.impl;
 
 import com.github.nightfall.cbds.io.CompoundObject;
 import com.github.nightfall.cbds.io.serial.api.IKeylessDeserializer;
-import com.github.nightfall.cbds.io.serial.api.IKeylessSerializer;
 import com.github.nightfall.cbds.io.serial.api.INamedDeserializer;
 import com.github.nightfall.cbds.io.serial.obj.IDataStreamSerializable;
 import com.github.nightfall.cbds.io.serial.obj.IKeylessSerializable;
@@ -192,7 +191,7 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
     public <T extends IDataStreamSerializable> T readRawObject(Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
-            obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsPrimitive())));
+            obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsNative())));
             return obj;
         } catch (
                 InstantiationException | IllegalAccessException
@@ -219,7 +218,7 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
     public <T extends INamedSerializable> T readNamedObject(Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
-            obj.read(INamedDeserializer.createDefault(readByteArrayAsPrimitive(), false));
+            obj.read(INamedDeserializer.createDefault(readByteArrayAsNative(), false));
             return obj;
         } catch (
                 InstantiationException | IllegalAccessException
@@ -243,10 +242,10 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
     }
 
     @Override
-    public <T extends IKeylessSerializable> T readUnNamedObject(Class<T> type) {
+    public <T extends IKeylessSerializable> T readKeylessObject(Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
-            obj.read(newInstance(readByteArrayAsPrimitive(), false));
+            obj.read(newInstance(readByteArrayAsNative(), false));
             return obj;
         } catch (
                 InstantiationException | IllegalAccessException
@@ -259,12 +258,12 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
     }
 
     @Override
-    public <T extends IKeylessSerializable> T[] readUnNamedObjectArray(Class<T> type) throws IOException {
+    public <T extends IKeylessSerializable> T[] readKeylessObjectArray(Class<T> type) throws IOException {
         int length = readInt();
         //noinspection unchecked
         T[] t = (T[]) Array.newInstance(type, length);
         for (int i = 0; i < t.length; i++) {
-            t[i] = readUnNamedObject(type);
+            t[i] = readKeylessObject(type);
         }
         return t;
     }
@@ -275,7 +274,7 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
 
         try {
             //noinspection unchecked
-            return (T) KEYLESS_DESERIALIZER_MAP.get(type).read(newInstance(readByteArrayAsPrimitive()));
+            return (T) KEYLESS_DESERIALIZER_MAP.get(type).read(newInstance(readByteArrayAsNative()));
         } catch (
                 IllegalArgumentException | SecurityException e
         ) {

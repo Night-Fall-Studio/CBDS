@@ -19,12 +19,12 @@ public class ByteArrayWriterAndReader implements INamedCustomSerializable<ByteAr
 
     @Override
     public ByteArray read(INamedDeserializer deserializer) {
-        return new ByteArray(deserializer.readByteArrayAsPrimitive("items"));
+        return new ByteArray(deserializer.readByteArrayAsNative("items"));
     }
 
     @Override
     public ByteArray read(IKeylessDeserializer in) throws IOException{
-        return new ByteArray(in.readByteArrayAsPrimitive());
+        return new ByteArray(in.readByteArrayAsNative());
     }
 
     @Override

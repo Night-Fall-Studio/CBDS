@@ -19,12 +19,12 @@ public class BooleanArrayWriterAndReader implements INamedCustomSerializable<Boo
 
     @Override
     public BooleanArray read(INamedDeserializer deserializer) {
-        return new BooleanArray(deserializer.readBooleanArrayAsPrimitive("items"));
+        return new BooleanArray(deserializer.readBooleanArrayAsNative("items"));
     }
 
     @Override
     public BooleanArray read(IKeylessDeserializer in) throws IOException {
-        return new BooleanArray(in.readBooleanArrayAsPrimitive());
+        return new BooleanArray(in.readBooleanArrayAsNative());
     }
 
     @Override

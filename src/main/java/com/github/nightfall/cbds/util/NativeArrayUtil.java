@@ -9,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * The basic array util allowing the conversion of Class arrays to native arrays like Byte[] to byte[].
+ * A basic array util for class wrapper arrays to native arrays.
  *
  * @author Mr Zombii
  * @since 1.0.0
@@ -17,7 +17,7 @@ import java.util.List;
 public class NativeArrayUtil {
 
     /**
-     * The basic method that allows you to convert a Byte[] array to a native byte[] array.
+     * Converts a Byte[] array to a native byte[] array.
      */
     @Contract(pure = true)
     public static byte[] toNativeArray(Byte[] array) {
@@ -27,7 +27,7 @@ public class NativeArrayUtil {
     }
 
     /**
-     * The basic method that allows you to convert a Short[] array to a native short[] array.
+     * Converts a Short[] array to a native short[] array.
      */
     @Contract(pure = true)
     public static short[] toNativeArray(Short[] array) {
@@ -37,7 +37,7 @@ public class NativeArrayUtil {
     }
 
     /**
-     * The basic method that allows you to convert an Integer[] array to a native int[] array.
+     * Converts an Integer[] array to a native int[] array.
      */
     @Contract(pure = true)
     public static int[] toNativeArray(Integer[] array) {
@@ -47,7 +47,7 @@ public class NativeArrayUtil {
     }
 
     /**
-     * The basic method that allows you to convert a Long[] array to a native long[] array.
+     * Converts a Long[] array to a native long[] array.
      */
     @Contract(pure = true)
     public static long[] toNativeArray(Long[] array) {
@@ -57,7 +57,7 @@ public class NativeArrayUtil {
     }
 
     /**
-     * The basic method that allows you to convert a Float[] array to a native float[] array.
+     * Converts a Float[] array to a native float[] array.
      */
     @Contract(pure = true)
     public static float[] toNativeArray(Float[] array) {
@@ -67,7 +67,7 @@ public class NativeArrayUtil {
     }
 
     /**
-     * The basic method that allows you to convert a Double[] array to a native double[] array.
+     * Converts a Double[] array to a native double[] array.
      */
     @Contract(pure = true)
     public static double[] toNativeArray(Double[] array) {
@@ -77,7 +77,7 @@ public class NativeArrayUtil {
     }
 
     /**
-     * The basic method that allows you to convert a Boolean[] array to a native boolean[] array.
+     * Converts a Boolean[] array to a native boolean[] array.
      */
     @Contract(pure = true)
     public static boolean[] toNativeArray(Boolean[] array) {
@@ -87,11 +87,91 @@ public class NativeArrayUtil {
     }
 
     /**
-     * The basic method that allows you to convert a Character[] array to a native char[] array.
+     * Converts a Character[] array to a native char[] array.
      */
     @Contract(pure = true)
     public static char[] toNativeArray(Character[] array) {
         char[] pArray = new char[array.length];
+        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
+        return pArray;
+    }
+
+    /**
+     * Converts a byte[] array to a Byte[] array.
+     */
+    @Contract(pure = true)
+    public static Byte[] toObjectLikeArray(byte[] array) {
+        Byte[] pArray = new Byte[array.length];
+        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
+        return pArray;
+    }
+
+    /**
+     * Converts a short[] array to a Short[] array.
+     */
+    @Contract(pure = true)
+    public static Short[] toObjectLikeArray(short[] array) {
+        Short[] pArray = new Short[array.length];
+        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
+        return pArray;
+    }
+
+    /**
+     * Converts an int[] array to a Integer[] array.
+     */
+    @Contract(pure = true)
+    public static Integer[] toObjectLikeArray(int[] array) {
+        Integer[] pArray = new Integer[array.length];
+        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
+        return pArray;
+    }
+
+    /**
+     * Converts a long[] array to a Long[] array.
+     */
+    @Contract(pure = true)
+    public static Long[] toObjectLikeArray(long[] array) {
+        Long[] pArray = new Long[array.length];
+        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
+        return pArray;
+    }
+
+    /**
+     * Converts a float[] array to a Float[] array.
+     */
+    @Contract(pure = true)
+    public static Float[] toObjectLikeArray(float[] array) {
+        Float[] pArray = new Float[array.length];
+        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
+        return pArray;
+    }
+
+    /**
+     * Converts a double[] array to a Double[] array.
+     */
+    @Contract(pure = true)
+    public static Double[] toObjectLikeArray(double[] array) {
+        Double[] pArray = new Double[array.length];
+        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
+        return pArray;
+    }
+
+    /**
+     * Converts a boolean[] array to a Boolean[] array.
+     */
+    @Contract(pure = true)
+    public static Boolean[] toObjectLikeArray(boolean[] array) {
+        Boolean[] pArray = new Boolean[array.length];
+        for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
+        return pArray;
+    }
+
+    /**
+     * Converts a char[] array to a Character[] array.
+     */
+    @Contract(pure = true)
+    public static Character[] toObjectLikeArray(char[] array) {
+        Character[] pArray = new Character[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
         return pArray;
     }

@@ -46,7 +46,7 @@ public class CBDSConstants {
      * A utility method for loading Service Classes using one class reference and one consuming method.
      *
      * @param clazz The class being used as a service.
-     * @param method The method to be called to consume each object found.
+     * @param method The consumer call the process each service object found.
      */
     public static <T> void register(Class<T> clazz, Consumer<T> method) {
         // Init from other jars

@@ -19,12 +19,12 @@ public class ShortArrayWriterAndReader implements INamedCustomSerializable<Short
 
     @Override
     public ShortArray read(INamedDeserializer deserializer) {
-        return new ShortArray(deserializer.readShortArrayAsPrimitive("items"));
+        return new ShortArray(deserializer.readShortArrayAsNative("items"));
     }
 
     @Override
     public ShortArray read(IKeylessDeserializer in) throws IOException{
-        return new ShortArray(in.readShortArrayAsPrimitive());
+        return new ShortArray(in.readShortArrayAsNative());
     }
 
     @Override

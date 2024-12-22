@@ -12,21 +12,21 @@ package com.github.nightfall.cbds.util;
 public interface ILogWrapper {
 
     /**
-     * The basic informational logging method
+     * Logs basic information.
      *
      * @param s The message being logged.
      */
     void info(String s);
 
     /**
-     * The warning logging method for non-fatal errors.
+     * Logs out information as a warning.
      *
      * @param s The message being logged.
      */
     void warn(String s);
 
     /**
-     * The error logging method for possible fatal errors.
+     * Logs out information as an error which could be a fatal error.
      *
      * @param s The message being logged.
      */

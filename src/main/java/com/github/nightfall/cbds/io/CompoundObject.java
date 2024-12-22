@@ -96,7 +96,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public byte[] readByteArrayAsPrimitive(String name) {
+    public byte[] readByteArrayAsNative(String name) {
         Byte[] array = (Byte[]) OBJECT_MAP.get(name);
         byte[] pArray = new byte[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
@@ -114,7 +114,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public short[] readShortArrayAsPrimitive(String name) {
+    public short[] readShortArrayAsNative(String name) {
         Short[] array = (Short[]) OBJECT_MAP.get(name);
         short[] pArray = new short[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
@@ -132,7 +132,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public int[] readIntArrayAsPrimitive(String name) {
+    public int[] readIntArrayAsNative(String name) {
         Integer[] array = (Integer[]) OBJECT_MAP.get(name);
         int[] pArray = new int[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
@@ -150,7 +150,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public long[] readLongArrayAsPrimitive(String name) {
+    public long[] readLongArrayAsNative(String name) {
         Long[] array = (Long[]) OBJECT_MAP.get(name);
         long[] pArray = new long[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
@@ -168,7 +168,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public float[] readFloatArrayAsPrimitive(String name) {
+    public float[] readFloatArrayAsNative(String name) {
         Float[] array = (Float[]) OBJECT_MAP.get(name);
         float[] pArray = new float[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
@@ -186,7 +186,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public double[] readDoubleArrayAsPrimitive(String name) {
+    public double[] readDoubleArrayAsNative(String name) {
         Double[] array = (Double[]) OBJECT_MAP.get(name);
         double[] pArray = new double[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
@@ -204,7 +204,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public boolean[] readBooleanArrayAsPrimitive(String name) {
+    public boolean[] readBooleanArrayAsNative(String name) {
         Boolean[] array = (Boolean[]) OBJECT_MAP.get(name);
         boolean[] pArray = new boolean[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
@@ -222,7 +222,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public char[] readCharArrayAsPrimitive(String name) {
+    public char[] readCharArrayAsNative(String name) {
         Character[] array = (Character[]) OBJECT_MAP.get(name);
         char[] pArray = new char[array.length];
         for (int i = 0; i < pArray.length; i++) pArray[i] = array[i];
@@ -346,7 +346,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T extends IKeylessSerializable> T readUnNamedObject(String name, Class<T> type) {
+    public <T extends IKeylessSerializable> T readKeylessObject(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isAssignableFrom(o.getClass())) return (T) o;
@@ -366,7 +366,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T extends IKeylessSerializable> T[] readUnNamedObjectArray(String name, Class<T> type) {
+    public <T extends IKeylessSerializable> T[] readKeylessObjectArray(String name, Class<T> type) {
         Object o = OBJECT_MAP.get(name);
 
         if (type.isArray() && type.isAssignableFrom(o.getClass())) return (T[]) o;
@@ -445,7 +445,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     public void read(INamedDeserializer deserializer) throws IOException {
         String[] keys = deserializer.readStringArray("keys");
 
-        INamedDeserializer miniDeserializer = deserializer.newInstance(deserializer.readByteArrayAsPrimitive("data"));
+        INamedDeserializer miniDeserializer = deserializer.newInstance(deserializer.readByteArrayAsNative("data"));
 
         for (String key : keys) {
             OBJECT_MAP.put(key, miniDeserializer.getObject(key));
@@ -455,7 +455,7 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
 
     @Override
     public void read(IKeylessDeserializer deserializer) throws IOException {
-        byte[] bytes = deserializer.readByteArrayAsPrimitive();
+        byte[] bytes = deserializer.readByteArrayAsNative();
         read(INamedDeserializer.createDefault(bytes, false));
     }
 
@@ -597,13 +597,13 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
     }
 
     @Override
-    public <T extends IKeylessSerializable> void writeUnNamedObject(String name, T object) {
-
+    public <T extends IKeylessSerializable> void writeKeylessObject(String name, T object) {
+        OBJECT_MAP.put(name, object);
     }
 
     @Override
-    public <T extends IKeylessSerializable> void writeUnNamedObjectArray(String name, T[] array) {
-
+    public <T extends IKeylessSerializable> void writeKeylessObjectArray(String name, T[] array) {
+        OBJECT_MAP.put(name, array);
     }
 
     @Override
@@ -635,6 +635,12 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
 
     @Override
     public void write(INamedSerializer serializer) throws IOException {
+        if (OBJECT_MAP.isEmpty()) {
+            serializer.writeStringArray("keys", new String[0]);
+            serializer.writeByteArray("data", new byte[0]);
+            return;
+        }
+
         serializer.writeStringArray("keys", OBJECT_MAP.keySet().toArray(new String[0]));
 
         INamedSerializer miniSerializer = serializer.newInstance();
@@ -692,8 +698,8 @@ public class CompoundObject implements INamedSerializable, INamedDeserializer, I
 
             if (o instanceof INamedSerializable) miniSerializer.writeNamedObject(key, (INamedSerializable) o);
             if (o instanceof INamedSerializable[]) miniSerializer.writeNamedObjectArray(key, (INamedSerializable[]) o);
-            if (o instanceof IKeylessSerializable) miniSerializer.writeUnNamedObject(key, (IKeylessSerializable) o);
-            if (o instanceof IKeylessSerializable[]) miniSerializer.writeUnNamedObjectArray(key, (IKeylessSerializable[]) o);
+            if (o instanceof IKeylessSerializable) miniSerializer.writeKeylessObject(key, (IKeylessSerializable) o);
+            if (o instanceof IKeylessSerializable[]) miniSerializer.writeKeylessObjectArray(key, (IKeylessSerializable[]) o);
             if (o instanceof IDataStreamSerializable) miniSerializer.writeRawObject(key, (IDataStreamSerializable) o);
             if (o instanceof IDataStreamSerializable[]) miniSerializer.writeRawObjectArray(key, (IDataStreamSerializable[]) o);
         }

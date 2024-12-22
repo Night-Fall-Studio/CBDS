@@ -19,12 +19,12 @@ public class FloatArrayWriterAndReader implements INamedCustomSerializable<Float
 
     @Override
     public FloatArray read(INamedDeserializer deserializer) {
-        return new FloatArray(deserializer.readFloatArrayAsPrimitive("items"));
+        return new FloatArray(deserializer.readFloatArrayAsNative("items"));
     }
 
     @Override
     public FloatArray read(IKeylessDeserializer in) throws IOException{
-        return new FloatArray(in.readFloatArrayAsPrimitive());
+        return new FloatArray(in.readFloatArrayAsNative());
     }
 
     @Override

@@ -19,13 +19,13 @@ import java.io.IOException;
 public interface IKeylessSerializable {
 
     /**
-     * The method called on the uninitialized object when its being read from a deserializer
+     * Deserializes data for use inside this serializable.
      * @param in The parent deserializer that contains all the data for the class being deserialized.
      */
     void read(IKeylessDeserializer in) throws IOException;
 
     /**
-     * The method called on the object when its being serialized.
+     * Writes the data from this object to a serializer.
      * @param out The parent serializer that is being written to.
      */
     void write(IKeylessSerializer out) throws IOException;

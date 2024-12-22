@@ -19,12 +19,12 @@ public class LongArrayWriterAndReader implements INamedCustomSerializable<LongAr
 
     @Override
     public LongArray read(INamedDeserializer deserializer) {
-        return new LongArray(deserializer.readLongArrayAsPrimitive("items"));
+        return new LongArray(deserializer.readLongArrayAsNative("items"));
     }
 
     @Override
     public LongArray read(IKeylessDeserializer in) throws IOException{
-        return new LongArray(in.readLongArrayAsPrimitive());
+        return new LongArray(in.readLongArrayAsNative());
     }
 
     @Override

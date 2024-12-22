@@ -19,12 +19,12 @@ public class CharArrayWriterAndReader implements INamedCustomSerializable<CharAr
 
     @Override
     public CharArray read(INamedDeserializer deserializer) {
-        return new CharArray(deserializer.readCharArrayAsPrimitive("items"));
+        return new CharArray(deserializer.readCharArrayAsNative("items"));
     }
 
     @Override
     public CharArray read(IKeylessDeserializer in) throws IOException{
-        return new CharArray(in.readCharArrayAsPrimitive());
+        return new CharArray(in.readCharArrayAsNative());
     }
 
     @Override

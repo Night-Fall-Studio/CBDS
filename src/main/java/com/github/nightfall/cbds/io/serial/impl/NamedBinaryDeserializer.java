@@ -491,7 +491,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     public <T extends IDataStreamSerializable> T readRawObject(String name, Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
-            obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsPrimitive(name))));
+            obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsNative(name))));
             return obj;
         } catch (
                 InstantiationException | IllegalAccessException
@@ -563,7 +563,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     }
 
     @Override
-    public <T extends IKeylessSerializable> T readUnNamedObject(String name, Class<T> type) {
+    public <T extends IKeylessSerializable> T readKeylessObject(String name, Class<T> type) {
         try {
             T obj = type.getDeclaredConstructor().newInstance();
             obj.read((IKeylessDeserializer) keyToValue.get(name));
@@ -579,7 +579,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     }
 
     @Override
-    public <T extends IKeylessSerializable> T[] readUnNamedObjectArray(String name, Class<T> type) {
+    public <T extends IKeylessSerializable> T[] readKeylessObjectArray(String name, Class<T> type) {
         IKeylessDeserializer[] objs = (IKeylessDeserializer[]) keyToValue.get(name);
         //noinspection unchecked
         T[] t = (T[]) Array.newInstance(type, objs.length);

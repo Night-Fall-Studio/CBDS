@@ -73,12 +73,12 @@ public class Main {
         for (int i = 0; i < objs.length; i++) objs[i] = new TestObject();
 
         startTime = System.nanoTime();
-        serializer.writeUnNamedObjectArray("testObjs", objs);
+        serializer.writeKeylessObjectArray("testObjs", objs);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to write " + objCount + " objects to CBDS");
 
         startTime = System.nanoTime();
-        userializer.writeUnNamedObjectArray(objs);
+        userializer.writeKeylessObjectArray(objs);
 
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to write " + objCount + " objects to UCBDS");
@@ -125,7 +125,7 @@ public class Main {
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize CBDS");
         startTime = System.nanoTime();
-        deserializer.readUnNamedObjectArray("testObjs", TestObject.class);
+        deserializer.readKeylessObjectArray("testObjs", TestObject.class);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from CBDS");
 
@@ -136,7 +136,7 @@ public class Main {
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize COMPRESSED CBDS");
         startTime = System.nanoTime();
-        deserializerc.readUnNamedObjectArray("testObjs", TestObject.class);
+        deserializerc.readKeylessObjectArray("testObjs", TestObject.class);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from COMPRESSED CBDS");
 
@@ -147,7 +147,7 @@ public class Main {
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize UCBDS");
         startTime = System.nanoTime();
-        deserializer0.readUnNamedObjectArray(TestObject.class);
+        deserializer0.readKeylessObjectArray(TestObject.class);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from UCBDS");
 
@@ -158,7 +158,7 @@ public class Main {
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to deserialize COMPRESSED UCBDS");
         startTime = System.nanoTime();
-        deserializer1.readUnNamedObjectArray(TestObject.class);
+        deserializer1.readKeylessObjectArray(TestObject.class);
         endTime = System.nanoTime();
         System.out.println("Took " + nanoToMilli(endTime - startTime) + "ms to read " + objCount + " item object array from COMPRESSED UCBDS");
 

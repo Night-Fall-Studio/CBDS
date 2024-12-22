@@ -19,12 +19,12 @@ public class Matrix3WriterAndReader implements INamedCustomSerializable<Matrix3>
 
     @Override
     public Matrix3 read(INamedDeserializer deserializer) {
-        return new Matrix3(deserializer.readFloatArrayAsPrimitive("val"));
+        return new Matrix3(deserializer.readFloatArrayAsNative("val"));
     }
 
     @Override
     public Matrix3 read(IKeylessDeserializer in) throws IOException{
-        return new Matrix3(in.readFloatArrayAsPrimitive());
+        return new Matrix3(in.readFloatArrayAsNative());
     }
 
     @Override

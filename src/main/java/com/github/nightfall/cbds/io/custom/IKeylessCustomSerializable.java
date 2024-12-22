@@ -19,14 +19,14 @@ public interface IKeylessCustomSerializable<T> {
 
 
     /**
-     * The method used to deserialize classes after being read from a deserializer.
+     * Deserializes data and creates a new object of class type it's responsible for.
      *
      * @param in The parent serializer that contains all the data for the class being deserialized.
      */
     T read(IKeylessDeserializer in) throws IOException;
 
     /**
-     * The method called when this class is being serialized.
+     * Serializes data from the provided object.
      *
      * @param out The parent serializer that is being written to.
      * @param obj The object being serialized.
@@ -34,7 +34,7 @@ public interface IKeylessCustomSerializable<T> {
     void write(IKeylessSerializer out, T obj) throws IOException;
 
     /**
-     * The class that this serializable controls during serialization and deserialization happens.
+     * Gets the class this serializable is responsible for.
      */
     Class<T> getSerializableType();
 
