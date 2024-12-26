@@ -1,0 +1,110 @@
+package com.github.nightfall.odsl.io.serial;
+
+/**
+ * A class keeping track of each object serialization type used by INamed serial and deserializers.
+ *
+ * @see com.github.nightfall.odsl.io.serial.api.INamedSerializer
+ * @see com.github.nightfall.odsl.io.serial.api.INamedDeserializer
+ *
+ * @author Mr Zombii
+ * @since 1.0.0
+ */
+public enum SerializationType {
+    STRING_SCHEMA_sINT,
+    STRING_SCHEMA_sSHORT,
+    STRING_SCHEMA_sBYTE,
+
+    BYTE,
+
+    SHORT_sSHORT,
+    SHORT_sBYTE,
+
+    INT_sINT,
+    INT_sSHORT,
+    INT_sBYTE,
+
+    LONG_sLONG,
+    LONG_sINT,
+    LONG_sSHORT,
+    LONG_sBYTE,
+
+    FLOAT,
+    DOUBLE,
+    BOOLEAN,
+
+    CHAR,
+
+    STRING_REGULAR,
+    STRING_sINT,
+    STRING_sSHORT,
+    STRING_sBYTE,
+
+    RAW_OBJECT_sINT,
+    RAW_OBJECT_sSHORT,
+    RAW_OBJECT_sBYTE,
+
+    NAMED_OBJECT_sINT,
+    NAMED_OBJECT_sSHORT,
+    NAMED_OBJECT_sBYTE,
+
+    UNNAMED_OBJECT_sINT,
+    UNNAMED_OBJECT_sSHORT,
+    UNNAMED_OBJECT_sBYTE,
+
+    CUSTOM_OBJECT_sINT,
+    CUSTOM_OBJECT_sSHORT,
+    CUSTOM_OBJECT_sBYTE,
+
+    BYTE_ARRAY_sINT,
+    BYTE_ARRAY_sSHORT,
+    BYTE_ARRAY_sBYTE,
+
+    SHORT_ARRAY_sINT,
+    SHORT_ARRAY_sSHORT,
+    SHORT_ARRAY_sBYTE,
+
+    INT_ARRAY_sINT,
+    INT_ARRAY_sSHORT,
+    INT_ARRAY_sBYTE,
+
+    LONG_ARRAY_sINT,
+    LONG_ARRAY_sSHORT,
+    LONG_ARRAY_sBYTE,
+
+    FLOAT_ARRAY_sINT,
+    FLOAT_ARRAY_sSHORT,
+    FLOAT_ARRAY_sBYTE,
+
+    DOUBLE_ARRAY_sINT,
+    DOUBLE_ARRAY_sSHORT,
+    DOUBLE_ARRAY_sBYTE,
+
+    BOOLEAN_ARRAY_sINT,
+    BOOLEAN_ARRAY_sSHORT,
+    BOOLEAN_ARRAY_sBYTE,
+
+    CHAR_ARRAY_sINT,
+    CHAR_ARRAY_sSHORT,
+    CHAR_ARRAY_sBYTE,
+
+    STRING_ARRAY_sINT,
+    STRING_ARRAY_sSHORT,
+    STRING_ARRAY_sBYTE,
+
+    RAW_OBJECT_ARRAY_sINT,
+    RAW_OBJECT_ARRAY_sSHORT,
+    RAW_OBJECT_ARRAY_sBYTE,
+
+    NAMED_OBJECT_ARRAY_sINT,
+    NAMED_OBJECT_ARRAY_sSHORT,
+    NAMED_OBJECT_ARRAY_sBYTE,
+
+    UNNAMED_OBJECT_ARRAY_sINT,
+    UNNAMED_OBJECT_ARRAY_sSHORT,
+    UNNAMED_OBJECT_ARRAY_sBYTE,
+
+    CUSTOM_OBJECT_ARRAY_sINT,
+    CUSTOM_OBJECT_ARRAY_sSHORT,
+    CUSTOM_OBJECT_ARRAY_sBYTE
+
+}

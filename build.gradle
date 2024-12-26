@@ -87,21 +87,21 @@ compileCosmicreachJava {
 }
 
 tasks.register("buildSourceJar", Jar) {
-    group = "cbds"
+    group = "odsl"
     from sourceSets.main.allSource
 
     setArchiveFileName("${p_name}-${version}-source.jar")
 }
 
-tasks.register("buildCBDSJar", Jar) {
-    group = "cbds"
+tasks.register("buildODSLJar", Jar) {
+    group = "odsl"
     from(sourceSets.main.output, sourceSets.main.output)
 
     setArchiveFileName("${p_name}-${version}.jar")
 }
 
 tasks.register("buildLibgdx", Jar) {
-    group = "cbds"
+    group = "odsl"
     from(sourceSets.libgdx.output, sourceSets.libgdx.output)
 
     setArchiveFileName("${p_name}-${version}-libgdx.jar")
