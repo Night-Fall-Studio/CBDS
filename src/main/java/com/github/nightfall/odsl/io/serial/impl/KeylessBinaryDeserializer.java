@@ -226,6 +226,7 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
                 | NoSuchMethodException | SecurityException
                 | IOException e
         ) {
+            e.printStackTrace();
             return null;
         }
     }
