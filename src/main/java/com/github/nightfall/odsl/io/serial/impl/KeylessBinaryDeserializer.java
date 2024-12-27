@@ -11,6 +11,7 @@ import com.github.nightfall.odsl.util.ThrowableSupplier;
 
 import java.io.ByteArrayInputStream;
 import java.io.DataInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
@@ -189,8 +190,10 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
 
     @Override
     public <T extends IDataStreamSerializable> T readRawObject(Class<T> type) {
+        T obj = null;
+
         try {
-            T obj = type.getDeclaredConstructor().newInstance();
+            obj = type.getDeclaredConstructor().newInstance();
             obj.read(new DataInputStream(new ByteArrayInputStream(readByteArrayAsNative())));
             return obj;
         } catch (
@@ -199,6 +202,7 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
                 | NoSuchMethodException | SecurityException
                 | IOException e
         ) {
+            if (e instanceof EOFException) return obj;
             return null;
         }
     }
@@ -216,8 +220,9 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
 
     @Override
     public <T extends INamedSerializable> T readNamedObject(Class<T> type) {
+        T obj = null;
         try {
-            T obj = type.getDeclaredConstructor().newInstance();
+            obj = type.getDeclaredConstructor().newInstance();
             obj.read(INamedDeserializer.createDefault(readByteArrayAsNative(), false));
             return obj;
         } catch (
@@ -226,7 +231,7 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
                 | NoSuchMethodException | SecurityException
                 | IOException e
         ) {
-            e.printStackTrace();
+            if (e instanceof EOFException) return obj;
             return null;
         }
     }
@@ -244,8 +249,10 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
 
     @Override
     public <T extends IKeylessSerializable> T readKeylessObject(Class<T> type) {
+
+        T obj = null;
         try {
-            T obj = type.getDeclaredConstructor().newInstance();
+            obj = type.getDeclaredConstructor().newInstance();
             obj.read(newInstance(readByteArrayAsNative(), false));
             return obj;
         } catch (
@@ -254,6 +261,7 @@ public class KeylessBinaryDeserializer implements IKeylessDeserializer {
                 | NoSuchMethodException | SecurityException
                 | IOException e
         ) {
+            if (e instanceof EOFException) return obj;
             return null;
         }
     }

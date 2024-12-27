@@ -524,8 +524,9 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
     }
 
     public <T extends INamedSerializable> T readNamedObject(String name, Class<T> type) {
+        T obj = null;
         try {
-            T obj = type.getDeclaredConstructor().newInstance();
+            obj = type.getDeclaredConstructor().newInstance();
             obj.read((INamedDeserializer) keyToValue.get(name));
             return obj;
         } catch (
@@ -555,6 +556,7 @@ public class NamedBinaryDeserializer implements INamedDeserializer {
                     | NoSuchMethodException | SecurityException
                     | IOException e
             ) {
+
                 objs[i] = null;
             }
         }
