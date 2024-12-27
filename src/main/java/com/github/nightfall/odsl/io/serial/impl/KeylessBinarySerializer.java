@@ -61,7 +61,7 @@ public class KeylessBinarySerializer implements IKeylessSerializer {
 
     public void writeIntArray(int[] array) throws IOException {
         output.writeInt(array.length);
-        for (int i : array) output.writeShort(i);
+        for (int i : array) output.writeInt(i);
     }
 
     public void writeLong(long i) throws IOException {
@@ -160,8 +160,6 @@ public class KeylessBinarySerializer implements IKeylessSerializer {
     public <T extends IKeylessSerializable> void writeKeylessObject(T object) throws IOException {
         IKeylessSerializer miniSerializer = newInstance();
         object.write(miniSerializer);
-
-        byte[] bytes = miniSerializer.toBytes();
 
         writeByteArray(miniSerializer.toBytes());
     }
